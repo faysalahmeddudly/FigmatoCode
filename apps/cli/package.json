@@ -1,0 +1,28 @@
+{
+  "name": "@figma-to-code/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "figma-engine": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@figma-to-code/shared-contracts": "workspace:*",
+    "@figma-to-code/figma-client": "workspace:*",
+    "@figma-to-code/figma-parser": "workspace:*",
+    "@figma-to-code/design-ir": "workspace:*",
+    "@figma-to-code/code-generator": "workspace:*",
+    "@figma-to-code/renderer": "workspace:*",
+    "@figma-to-code/geometry-engine": "workspace:*",
+    "@figma-to-code/visual-engine": "workspace:*",
+    "@figma-to-code/benchmark": "workspace:*",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.7"
+  }
+}

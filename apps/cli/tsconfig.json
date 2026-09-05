@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "references": [
+    { "path": "../../packages/shared-contracts" },
+    { "path": "../../packages/figma-client" },
+    { "path": "../../packages/figma-parser" },
+    { "path": "../../packages/design-ir" },
+    { "path": "../../packages/code-generator" },
+    { "path": "../../packages/renderer" },
+    { "path": "../../packages/geometry-engine" },
+    { "path": "../../packages/visual-engine" },
+    { "path": "../../packages/benchmark" }
+  ],
+  "include": ["src"]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@figma-to-code/root-cause-engine",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@figma-to-code/shared-contracts": "workspace:*",
+    "zod": "^3.24.1"
+  }
+}
