@@ -1,0 +1,1186 @@
+﻿Table of Contents
+
+
+PRD — Pixel-Fidelity Figma-to-Code Engine
+Phase 1–3 (Deterministic Core) | Phase 4 (AI/Automation) deferred
+v7 — Final Contract-Reconciled All-Phases Implementation Specification | deterministic core + controlled AI escalation + visual/compositing + responsive/constraints contracts
+
+Architecture diagram
+
+Phase 1-3 deterministic architecture with Phase 4 AI deferred
+
+1. Product framing
+Not: a Figma-to-React generator. Is: a browser-verified visual reverse-engineering compiler that generates code and iteratively optimizes it against a real Chromium render, measured against the original Figma design.
+Lock-in rule #1:
+The engine must never assume that Figma geometry directly equals CSS implementation. It must preserve observed geometry, infer implementation intent, evaluate the implementation in Chromium, and accept only validated improvements.
+Lock-in rule #2:
+Every optimization is reversible, measurable, scoped, and reproducible.
+“Solid” definition: the engineering design is solid — deterministic, debuggable, measurable. Not a promise of 100% pixel-perfect output. Controlled benchmark target: 95%+.
+
+2. Why AI is excluded from Phase 1–3
+Deliberate sequencing, not rejection:
+Reason
+Explanation
+Clean baseline
+Must know what the deterministic engine achieves alone before mixing in AI’s contribution.
+Determinism
+90%→95% must be repeatable and measurable. AI adds noise.
+Cost/latency
+50–100 diff regions per page; sequential AI calls make the loop slow and expensive.
+Own architecture
+rules → candidate search → AI escalation (last resort), never the reverse.
+Real moat
+The engine (IR, solver, comparator, optimizer) is the product, not an LLM wrapper.
+Exit criteria to unlock Phase 4: deterministic pipeline consistently hits ≥93–95% fidelity on the benchmark set. AI is then scoped narrowly to unresolved cases only (see §9 taxonomy) — never full-page generation.
+
+3. Success metrics
+Fidelity and Robustness are tracked as two separate scores — never collapsed into one number.
+Metric
+Phase 1 exit
+Phase 2 exit
+Phase 3 exit
+Fidelity score (static frame, primary breakpoint)
+pipeline runs, score computed
+≥ 90%
+≥ 95%
+Robustness score (responsive/flow/dynamic content)
+not required
+not required
+reported, no hard floor yet, tracked per §15.6 and validated per §17
+Determinism
+environment-frozen, reproducible (see §14)
+same
+same
+Manual intervention
+fully expected
+rare
+near zero on benchmark set
+Fidelity Score v1 = configurable weighted composite of Geometry + Layout + Typography + Style + Assets + Perceptual visual diff. Weights are not frozen now — they are benchmark-calibrated before Phase 3 exit, based on which dimensions actually correlate with visual correctness on the real benchmark set. Example only, not final: Fidelity = 96.2%, Robustness = 91% reported side by side.
+
+4. Phase 1 — Deterministic Compiler
+Goal: given one Figma frame, produce a real HTML/CSS render inside Chromium and get an honest, measured, reproducible score. Target here is pipeline correctness, not a high score.
+Figma → Extractor → Parser → Design IR → HTML/CSS → Controlled Chromium  → DOM metrics → Reference comparison → Score
+4.1 Reference Rendering Contract (mandatory, per benchmark frame)
+Figma geometry and Figma rendered pixels are not the same thing. Before any comparison is trusted, freeze and record for every benchmark frame: - exact viewport width/height - exact export dimensions - device scale factor (DPR) - font environment (which fonts, which weights, source) - image assets used (exact files/hashes) - background (transparent vs. filled, and which color) - crop/export mode used to generate the reference image
+The comparison engine consumes this contract as a fixed reference artifact — it does not re-derive it ad hoc per run.
+4.2 Persistent node identity (Phase 1, not Phase 4)
+Every NodeIR carries a stable identity from the very first parse, because Phase 2/3’s patch loop must re-recognize the same node across re-renders:
+interface NodeIdentity {  figmaId: string;  internalId: string;  structureHash: string;}
+Identity reconciliation rule: figmaId remains the stable source identity and internalId remains the logical IR identity. structureHash is recomputed after every committed structural patch. A structural patch must emit an identity-reconciliation record mapping affected pre-patch nodes to post-patch nodes; unchanged logical nodes retain their internalId. If a logical node cannot be deterministically mapped, the patch is rejected or the case is emitted as UNRESOLVED_SOURCE_AMBIGUITY.
+4.3 Preserve component/instance identity now, infer abstraction later
+Phase 1 preserves Figma’s native component/instance metadata as-is on the IR node (which component, which instance, which variant) — it does not attempt reusable React abstraction. That inference is Phase 4 (Structure Intelligence). Preserving the metadata now avoids an IR schema rewrite later.
+4.4 Relative geometry from day one
+For every node, compute both: - absolute geometry - geometry relative to its immediate parent
+Rule: use relative geometry for diagnosis, absolute geometry for final visual verification. Without this, a parent shifted +20px makes every descendant look independently wrong, and the optimizer chases the wrong target.
+4.5 Font/asset readiness precondition (non-optional)
+No screenshot is taken until all of the following are true: - document.fonts.ready resolved - all images loaded - network idle / asset readiness confirmed
+Screenshot-before-ready is not an acceptable shortcut, even in early prototyping.
+Deliverables
+figma-parser, design-ir (with NodeIdentity, relative geometry, preserved component metadata), code-generator (plain HTML/CSS only), renderer (Playwright/Chromium wrapper, enforces readiness precondition), geometry-engine + visual-engine (comparison v1), reference-artifact store per §4.1.
+Exit criteria
+Pipeline runs end-to-end on 3 benchmark frames (simple/medium/complex) and returns a real, reproducible score — the number itself can be 60–75% at this stage.
+
+5. Phase 2 — Deterministic Optimizer (target: 90%)
+Diff → Relative geometry → Ancestor-first diagnosis → Rule patch  → Same-browser evaluation → Commit / rollback
+5.1 Mutation boundaries (explicit allow-list)
+Canonical mutation authority: §16.4 is the normative mutation-boundary policy. This §5.1 table is a phase-level summary only; when rules differ, §16.4 governs.
+Allowed
+padding, gap, width, max-width, height, line-height
+Restricted (needs strong evidence)
+layout mode, component boundary, DOM structure, content, asset source
+Forbidden by default
+random absolute positioning, arbitrary transforms, full-tree rewrites
+Rule: a patch must mutate the smallest possible ancestor/subtree that explains the diff.
+5.2 Patch-based rollback (not full snapshots)
+Do not snapshot the entire project per candidate. Store per patch: - forward patch - reverse patch - parent version reference - score before - score after
+This keeps memory/IO bounded as the loop iterates.
+5.3 Chromium reuse contract
+Browser lifecycle:  1 browser process  1 reusable context  N candidate evaluations
+Candidate isolation is mandatory: each candidate must start from the same committed version and must not inherit prior candidate state. CSS overrides are applied and reset; cookies, localStorage, sessionStorage, IndexedDB, Cache Storage, service workers, permissions, and other mutable browser state must be cleared, blocked, or recreated according to the benchmark runtime policy. Candidate B must never inherit Candidate A state. Any state reset failure invalidates the candidate evaluation.
+Deliverables
+root-cause-engine (diff → node → parent → ancestors, using relative geometry), optimizer (rule-based, enforces mutation boundaries), patch-engine (apply/measure/commit/rollback per §5.2), regression log of every patch attempt.
+Exit criteria
+≥ 90% average fidelity score across the full benchmark set, zero manual code edits between runs.
+
+6. Phase 3 — Search + Responsive (target: 95%+)
+Worst subtree → Candidate generation → Cheap DOM filter → Beam search  → Visual evaluation → Best candidate → Responsive stress
+6.1 Type-specific candidate generation (not random CSS mutation)
+Ambiguity type
+Candidates
+Width
+fixed px / 100% + max-width / flex-based
+Gap
+measured value ± nearby values
+Alignment
+start / center / end / stretch
+Height
+auto / fixed / min-height / aspect-ratio
+Rule: mutate one hypothesis dimension at a time unless a rule explicitly defines a coupled change. This keeps the search space bounded and diagnosable.
+6.2 “Best version always survives” contract (mandatory)
+initialVersion = bestVersionfor every candidate:    evaluate fidelity and robustness    if candidate passes §15.5 acceptance gate:        if candidate ranks better than best eligible version:            bestVersion = candidatereturn globally best observed eligible version
+Optimization must never return an ineligible candidate. “Best” means best among eligible versions under §15.5: score improvement threshold, no critical regression, valid candidate, readiness-gated render. Fidelity ranks first, Robustness breaks Fidelity ties, then patch count and deterministic patch-ID tie-breakers apply as defined in §16.6.
+6.3 Responsive correctness — expanded definition
+“No overflow” alone is insufficient; a page can pass that check and still be visually wrong. Responsive correctness must check: - overflow - collision - unexpected text wrap - unexpected component displacement - container instability - horizontal scroll - broken aspect ratio
+Validated at 390 / 640 / 768 / 1024 / 1280 / 1440.
+6.4 Dynamic content stress test — guardrail
+Short/normal/long content injection may surface fixes like overflow: hidden or text-overflow: ellipsis. These are only acceptable when there is design evidence for them.
+Rule: stress-test fixes must not override inferred/reference design intent without explicit evidence. A fix that merely hides overflow to “pass” the test, without matching how the design was actually meant to behave, is rejected.
+Deliverables
+layout-solver (type-specific candidate generator + evaluator per §6.1), optimizer extended with beam search (width 2–3) + caching (DesignHash, IRHash, Viewport, DPR, FontHash), responsive-engine + flow-engine (expanded checks per §6.3), benchmark report per frame per breakpoint, best-version guarantee per §6.2.
+Exit criteria
+≥ 95% average fidelity score at the primary breakpoint, and no unresolved instances of the §6.3 failure list across 390–1440px on at least the simple and medium benchmark frames.
+
+7. Phase 4 — AI (reference only, not started)
+Unresolved cases → AI  ├── intent inference  ├── composition  ├── root-cause reasoning  └── structured patch proposals→ Structure Intelligence → React → Tailwind → Production cleanup
+AI consumes the unresolved case log (see §9 taxonomy) built up during Phase 2/3 — this becomes its trigger/training dataset, which is why the taxonomy is defined now rather than retrofitted later. Model-agnostic by design: engine value doesn’t depend on which LLM is plugged in.
+
+8. Determinism — hardened definition
+“Same input → same output” is only true if the environment is frozen. Determinism requires all of: - source (Figma file/frame version) - browser version - viewport - DPR - font files - assets - generator version - rule version - benchmark configuration
+→ same output. Any of these drifting invalidates a reproducibility claim.
+
+9. Unresolved case taxonomy (defined from Phase 2 onward)
+Every case the rule optimizer / candidate search cannot resolve is logged under one of:
+UNRESOLVED_LAYOUTUNRESOLVED_TYPOGRAPHYUNRESOLVED_ASSETUNRESOLVED_RENDERINGUNRESOLVED_RESPONSIVEUNRESOLVED_MAPPINGUNRESOLVED_SOURCE_AMBIGUITY
+This taxonomy is the handoff contract to Phase 4 — it defines exactly what AI is being asked to solve, rather than “whatever the pipeline couldn’t do.”
+Canonical mapping from the granular Phase 2/3 root-cause classes to these seven handoff buckets is defined in §16.1A and is normative for logging and AI routing.
+
+10. Minimal project structure for Phase 1–3
+figma-to-code/├── apps/│   └── cli/                  # simple CLI/script runner for now, web UI later├── packages/│   ├── figma-client/│   ├── figma-parser/│   ├── design-ir/             # NodeIdentity, relative geometry, component metadata preserved│   ├── layout-solver/         # Phase 3│   ├── paint-engine/            # Phase 1–3 visual normalization│   ├── compositing-engine/      # Phase 1–3 opacity/blend/blur│   ├── clipping-engine/         # Phase 1–3 clip/mask│   ├── stacking-engine/         # Phase 1–3 stacking/z-index/paint order│   ├── effect-engine/           # Phase 1–3 CSS/SVG effect mapping│   ├── code-generator/        # HTML/CSS/SVG through phase 3│   ├── renderer/              # Playwright/Chromium wrapper, readiness precondition enforced│   ├── geometry-engine/│   ├── visual-engine/│   ├── root-cause-engine/     # Phase 2│   ├── optimizer/             # rules (P2) -> + candidate search (P3)│   ├── patch-engine/          # Phase 2, patch-based rollback│   ├── responsive-engine/     # Phase 3│   ├── flow-engine/           # Phase 3│   └── font-engine/└── benchmark/    ├── frames/                 # simple / medium / complex test frames    ├── reference-artifacts/    # per Reference Rendering Contract, §4.1    └── reports/                # scored results per run, unresolved-case log
+No ai-agent, component-engine, structure-engine, or apps/web yet — those are Phase 4.
+
+11. First working prototype (concrete first milestone)
+Input: one Figma frame, 1440×900 — reference contract captured per §4.1
+Output: HTML/CSS (Phase 1 compiler)
+Chromium screenshot, only after font/asset readiness (§4.5)
+Geometry diff (relative + absolute, §4.4) + overlay
+Score
+Automatic padding/width/gap corrections within mutation boundaries (§5.1)
+Target: 90%+ on this one frame before touching Phase 3
+Do not touch React, Tailwind, AI, or component abstraction until this milestone is passed.
+
+12. Development order (condensed)
+Phase 1: Parser → Design IR (identity + relative geometry + component metadata)         → Basic Compiler → Chromium Runtime (readiness-gated) → Comparison v1Phase 2: Root-Cause Engine (relative-geometry-based) → Rule Optimizer (bounded mutations)         → Patch/Rollback loop (patch-based, not snapshot-based)             [target 90%]Phase 3: Layout Solver (type-specific candidates, one dimension at a time)         → Pruning/Beam/Cache → Best-version contract         → Responsive Validation (expanded checks) → Dynamic Content stress  [target 95%]Phase 4: AI escalation (consumes unresolved taxonomy) → Structure Intelligence         → React/Tailwind → Production cleanup         [NOT STARTED — reference only]
+
+12A. Phase 4 — Strong AI Architecture
+Purpose. AI is a controlled escalation layer, not the primary renderer. The deterministic compiler, Chromium renderer, comparator, optimizer, and rollback system remain authoritative. AI proposes interpretations and patches; browser measurement decides acceptance.
+12A.1 Model strategy
+• Gemini: primary multimodal analyzer for screenshots, assets, OCR, and large visual context.
+• OpenAI: complex layout reasoning, structured patch proposals, and difficult code-generation cases.
+• Claude: code review, cleanup, refactoring, and visual-difference explanation.
+• Groq: optional low-latency inference layer; quality depends on the vision model selected through it.
+• The router must not call every model by default; escalate only when deterministic rules fail.
+12A.2 AI routing
+• UNRESOLVED_LAYOUT → Gemini, then OpenAI if confidence is low.
+• UNRESOLVED_TYPOGRAPHY → OpenAI or Claude.
+• UNRESOLVED_ASSET → Gemini.
+• UNRESOLVED_RESPONSIVE → OpenAI, followed by multi-breakpoint browser validation.
+• UNRESOLVED_MAPPING → Claude or OpenAI.
+• UNRESOLVED_RENDERING → deterministic diagnosis first; AI only for explanation or a narrow hypothesis.
+• UNRESOLVED_SOURCE_AMBIGUITY → human review by default; AI may propose evidence-backed interpretations, but no structural or semantic patch may be committed without explicit source evidence and deterministic validation.
+12A.3 Structured patch contract
+AI must return validated JSON and minimal patches, never an uncontrolled full-tree rewrite. Each proposal contains target node identity, property, old value, new value, reason, evidence, confidence, expected effect, and alternatives.
+{  "targetNode": "hero-content",  "property": "gap",  "oldValue": "16px",  "newValue": "24px",  "reason": "Heading-to-paragraph spacing is smaller than the reference",  "confidence": 0.91}
+12A.4 Acceptance and rollback
+1. Validate every response against JSON Schema or Zod.
+2. Apply the smallest patch to the identified node or ancestor.
+3. Render only after fonts, images, and network assets are ready.
+4. Measure fidelity and robustness before and after the patch.
+5. Commit only when the relevant score improves without responsive regressions.
+6. Rollback automatically when the score decreases, a regression occurs, or output is invalid.
+12A.5 Confidence, disagreement, and caching
+Determinism boundary: Phase 4 AI proposal generation is potentially non-deterministic, even when the environment and inputs are frozen. Caching and versioning make accepted/cached proposals reproducible; they do not imply first-call model determinism. Only the post-proposal acceptance, validation, scoring, rollback, and release pipeline inherits the deterministic contract.
+• Record confidence and evidence for every AI inference.
+• For high-impact decisions, obtain independent proposals from two models and test both as candidates.
+• Cache by source hash, frame hash, viewport, DPR, font hash, asset hash, prompt version, and model version.
+• Version prompts, schemas, adapters, and model configuration as production artifacts.
+• Send low-confidence or repeatedly failing cases to a human-review queue.
+12A.6 New packages
+• ai-router/
+• model-adapters/
+• vision-analyzer/
+• design-intent-engine/
+• patch-proposer/
+• schema-validator/
+• prompt-registry/
+• ai-evaluation-cache/
+• human-review-queue/
+12A.7 Phase 4 exit criteria
+• AI is invoked only for logged unresolved cases.
+• All model outputs pass schema validation.
+• No accepted AI patch bypasses Chromium measurement or rollback.
+• AI improves the deterministic baseline without reducing robustness.
+• Fidelity and robustness are reported separately with model, prompt, and patch provenance.
+12B. Updated product principle
+The product is not an LLM wrapper. Its moat is the measurable reverse-engineering engine: Design IR, persistent node identity, relative geometry, controlled Chromium rendering, visual comparison, bounded search, responsive validation, and reversible patches. Models are interchangeable reasoning modules behind a strict implementation contract.
+13. Sourcing & third-party reference policy
+Purpose: several third-party tools and protocols (Figma MCP servers, existing Figma-to-HTML plugins, production design-to-code products) can accelerate specific packages below. This section defines exactly what may be reused, in what role, and under what constraint — so third-party code never quietly weakens the determinism guarantees in §8 or the AI containment rules in §12A.
+13.1 Figma MCP servers (official or open-source) — Phase 1 data source only
+Either the official Figma MCP server or a vetted open-source implementation may be used inside figma-client to fetch richer Figma data (variables, component/instance relationships, layout metadata) than the plain REST API exposes. This can improve the inputs to design-ir (§4.2, §4.3) but does not change the contract: every value pulled via MCP is still untrusted input that must pass through the Reference Rendering Contract (§4.1) and Chromium comparison before it affects a score.
+If an open-source MCP implementation is forked, pin it to an exact commit hash and record that hash as part of the determinism inputs in §8 ("generator version"). Do not track a moving fork — an unannounced upstream change must not silently alter output for the same input.
+13.2 Figma MCP in Phase 4 — evidence-only, not raw file access
+MCP must not be used to give AI models open-ended access to the live Figma file during escalation. This would reintroduce "AI as primary interpreter," which §12A.1 and the unresolved-case taxonomy (§9) explicitly rule out. Instead, when a case is escalated, the ai-router passes only the frozen evidence for that specific case: the relevant NodeIdentity, relative-geometry diff, and screenshot crop. MCP-sourced Figma context may be used to pre-populate that evidence during Phase 1 extraction, not injected live into a Phase 4 prompt.
+13.3 Existing Figma-to-HTML plugins (e.g. 10xHTML) — benchmark baseline only, not generator logic
+Third-party Figma-to-HTML output may be used as a benchmark baseline: run it against the same benchmark frames (§4, §18) and report its fidelity/robustness scores alongside this engine's own, to demonstrate the deterministic pipeline's contribution. Its generation logic must not be forked into code-generator. That package's output is derived solely from design-ir per the mutation-boundary and patch-rollback contracts (§5.1, §5.2); importing a third party's independent heuristics would introduce an unaudited, non-reproducible component into a system whose core claim is deterministic and debuggable output.
+13.4 Production design-to-code tools (e.g. Builder.io Visual Copilot, Figma Make) — architecture study only
+Their published architecture, workflow, and stated approach to layout solving may inform the design of layout-solver (Phase 3) and design-intent-engine (Phase 4) as reference material. No code or proprietary model output from these products may be copied into this codebase. Where their approach conflicts with a lock-in rule in this PRD (§1) — for example, treating AI as the primary generator rather than a controlled escalation layer — this PRD's rule wins.
+13.5 General reuse rule
+Any third-party code, prompt template, or protocol client adopted under §13.1–§13.4 is versioned and pinned exactly like an internal package (§8). If it cannot be pinned to a specific, reproducible version, it may be used for research and architecture reference, but not compiled into a shipped package.
+
+14. Final Implementation Contracts
+Purpose. This section converts the architecture into concrete engineering contracts. Any behavior not explicitly changed by a later Architecture Decision Record (ADR) is governed by these contracts. Implementation teams must not invent incompatible behavior inside individual packages.
+14.1 Input / Output contract
+Input manifest
+{
+  "figmaFile": "file-key-or-url",
+  "nodeId": "123:456",
+  "benchmarkId": "dashboard-01",
+  "referenceArtifact": "benchmark/reference-artifacts/dashboard-01.json",
+  "config": "engine.yaml"
+}
+
+Output layout
+output/<runId>/
+  source/
+  ir/design-ir.json
+  generated/index.html
+  generated/styles.css
+  generated/assets/
+  renders/<viewport>.png
+  diffs/<viewport>.png
+  reports/run.json
+  reports/patches.jsonl
+  reports/unresolved.jsonl
+  manifest.json
+A successful run is immutable after completion. Every output file is content-addressed or associated with the run manifest, and the manifest records all source, environment, configuration, rule, and artifact hashes required for reproducibility.
+14.2 Canonical NodeIR schema
+type NodeType =
+  | "DOCUMENT" | "PAGE" | "FRAME" | "GROUP" | "RECTANGLE" | "ELLIPSE"
+  | "TEXT" | "VECTOR" | "BOOLEAN" | "IMAGE" | "COMPONENT"
+  | "INSTANCE" | "SECTION";
+
+interface NodeIdentity {
+  figmaId: string;
+  internalId: string;
+  structureHash: string;
+}
+
+interface Rect { x:number; y:number; width:number; height:number; }
+interface RelativeRect { x:number; y:number; width:number; height:number; }
+
+interface NodeIR {
+  identity: NodeIdentity;
+  type: NodeType;
+  name: string;
+  parentId: string | null;
+  children: string[];
+  absolute: Rect;
+  relative: RelativeRect;
+  visible: boolean;
+  opacity: number;
+  layout: LayoutIR;
+  typography?: TypographyIR;
+  fills?: FillIR[];
+  strokes?: StrokeIR[];
+  effects?: EffectIR[];
+  radius?: RadiusIR;
+  asset?: AssetReference;
+  component?: ComponentMetadata;
+  source: SourceMetadata;
+}
+Canonical units are CSS pixels for geometry and dimensions, normalized RGBA for colors, 0–1 for opacity, and explicit font-family/weight/style tuples for typography. No package may silently reinterpret units.
+interface TransformIR {  rotation?: number;  matrix?: [number,number,number,number,number,number];  origin?: { x:number; y:number };}interface ConstraintIR {  horizontal: "LEFT" | "RIGHT" | "CENTER" | "LEFT_RIGHT" | "SCALE" | "STRETCH" | "NONE";  vertical: "TOP" | "BOTTOM" | "CENTER" | "TOP_BOTTOM" | "SCALE" | "STRETCH" | "NONE";}Rule: transforms and Figma constraints are canonical source data. Their browser representation must preserve observed rotation/transform and anchoring semantics across required breakpoints. Unsupported semantics become explicit unresolved cases rather than arbitrary positioning.
+14.3 LayoutIR schema
+interface LayoutIR {
+  mode: "NONE" | "AUTO_LAYOUT" | "GRID_LIKE" | "ABSOLUTE";
+  axis?: "HORIZONTAL" | "VERTICAL";
+  gap?: number;
+  padding?: { top:number; right:number; bottom:number; left:number };
+  align?: "START" | "CENTER" | "END" | "STRETCH";
+  justify?: "START" | "CENTER" | "END" | "SPACE_BETWEEN";
+  sizing?: { width:"FIXED"|"HUG"|"FILL"; height:"FIXED"|"HUG"|"FILL" };
+  wrap?: boolean;
+  minWidth?: number;
+  maxWidth?: number;
+  minHeight?: number;
+  maxHeight?: number;
+  aspectRatio?: number;
+}
+14.4 Figma extraction contract
+Authentication is supplied through a secret outside source control. Tokens are never persisted in IR, logs, benchmark artifacts, or generated code.
+Extractor recursively traverses the selected frame and preserves stable Figma IDs, component/instance metadata, paint/style data, layout data, text data, and asset references.
+Every external asset is downloaded, hashed, validated, and mapped to a deterministic local asset path before code generation.
+Extraction is versioned by parser version and Figma source version. A parser upgrade changes generator provenance and invalidates prior reproducibility claims.
+Rate limits and transient API failures use bounded retries with exponential backoff. Permanent failures terminate the run with a typed error code.
+14.5 Figma feature support policy
+Feature
+Phase 1–3
+Policy
+Frame / Group / Auto Layout
+YES
+Deterministically mapped to semantic HTML/CSS
+Text
+YES
+Exact font readiness required; missing font is a hard benchmark failure
+Image fills
+YES
+Downloaded and hashed; deterministic local asset path
+Component / Instance
+YES metadata
+Identity preserved; abstraction inference deferred to Phase 4
+Vector / Boolean
+LIMITED
+Supported when export/render path is deterministic; otherwise unresolved asset/rendering
+Effects / shadows
+YES basic
+Only representable CSS effects are emitted
+Prototype interactions
+NO
+Out of scope for visual compilation
+Video / live embeds
+NO
+Recorded as unsupported; not silently replaced
+Plugin-specific behavior
+NO
+Must not affect core compilation unless explicitly represented in source data
+Gradients
+YES / LIMITED
+Linear/radial/other supported types map through GradientIR; unsupported semantics become typed unresolved cases.
+Shadows / effects
+YES / LIMITED
+Deterministic CSS mappings with source order preserved; unsupported effects become UNRESOLVED_RENDERING.
+Blur / backdrop blur
+YES / LIMITED
+Layer/object/background blur are distinguished; mappings are validated in frozen Chromium.
+Masks / clipping
+YES / LIMITED
+ClipIR/MaskIR maps to clip-path, masks, SVG clipping, or overflow only when source semantics support the mapping.
+Opacity / blend / isolation
+YES / LIMITED
+CompositingIR preserves opacity, blend mode, and isolation; browser validation is mandatory.
+Stacking / z-index / overlays
+YES / LIMITED
+StackingIR preserves stacking context, z-index, paint order, and positioned descendants.
+Transforms / rotation
+YES / LIMITED
+TransformIR preserves rotation/matrix/origin; arbitrary transforms are forbidden as screenshot fixes.
+Figma constraints
+YES / LIMITED
+ConstraintIR models responsive anchoring/scale/stretch behavior and is validated across required breakpoints.
+14.6 Figma → HTML/CSS mapping rules
+Observed intent
+Default implementation
+Escalation condition
+Horizontal Auto Layout
+flex row
+Only if evidence indicates grid/other structure
+Vertical Auto Layout
+flex column
+Only if evidence indicates grid/other structure
+Auto Layout gap
+gap
+Never emulate with arbitrary transforms
+Padding
+padding
+Use side-specific values when asymmetric
+Hug contents
+auto intrinsic sizing
+Fallback only with measured evidence
+Fill container
+flex:1 / width:100% depending on axis
+Must preserve measured geometry
+Fixed size
+fixed px dimensions
+Candidate solver may relax only within explicit mutation rules
+Center alignment
+align-items / justify-content center
+Choose axis based on parent layout intent
+Absolute child
+position:absolute
+Allowed only when source evidence supports absolute placement
+Corner radius
+border-radius
+Per-corner values when source provides them
+Gradient fill
+GradientIR → deterministic CSS gradient
+Bounded angle/stop candidates only when measured evidence supports them
+Shadow/effect
+ShadowIR/EffectIR → CSS shadow/filter
+Bounded parameter candidates; unsupported effects unresolved
+Clip/mask
+ClipIR/MaskIR → clip-path / mask / SVG / overflow
+Only with equivalent source semantics
+Opacity/blend
+CompositingIR → opacity / mix-blend-mode / isolation
+Compositing/stacking regressions block commit
+Transform / rotation
+TransformIR → CSS transform
+Only source-supported transform; never arbitrary visual tracing
+Figma constraints
+ConstraintIR → responsive CSS/layout rules
+Must pass all required breakpoints
+The generator must prefer semantic layout primitives over screenshot-tracing tricks. An implementation that visually matches the reference but violates the source layout intent is not automatically considered correct.
+14.7 Generated-code contract
+Phase 1–3 output is deterministic HTML/CSS with inline or local SVG where required for vector or mask rendering, with no React, Tailwind, runtime UI framework, or client-side JavaScript dependency.
+DOM order is deterministic and follows normalized IR order.
+Class names are deterministic, based on internal node identity and role; random hashes are forbidden unless content-addressing is required by a cache layer.
+No external network dependency is permitted during benchmark rendering unless explicitly represented by the benchmark contract.
+Optimizer patches target the generated style model rather than rewriting the entire document.
+14.8 Reference artifact contract
+{
+  "schemaVersion": "1.0",
+  "frameId": "123:456",
+  "viewport": {"width":1440,"height":900},
+  "dpr": 1,
+  "export": {"width":1440,"height":900},
+  "background": {"mode":"filled","color":"#FFFFFF"},
+  "cropMode": "SCALE",
+  "fonts": [{"family":"Inter","weight":400,"style":"normal","sha256":"..."}],
+  "assets": [{"sourceId":"img-1","sha256":"...","path":"assets/img-1.png"}],
+  "referenceImage": "reference.png"
+}
+14.9 Font and asset readiness contract
+No screenshot is permitted until document.fonts.ready resolves, all referenced images report complete, and the page reaches the configured network/asset-ready state.
+If the exact benchmark font is unavailable, the run fails with FONT_MISSING; silent substitution is prohibited.
+Asset hashes are part of determinism inputs. Corrupt or mismatched assets terminate the run.
+Font and asset caches are content-addressed and immutable.
+14.10 Browser/runtime contract
+Frozen render inputs
+- Browser/Chromium version
+- Playwright version
+- Node/runtime version
+- OS/container image digest
+- viewport width/height
+- DPR
+- locale/timezone
+- color scheme
+- reduced-motion preference
+- font files/hashes
+- asset hashes
+- generator version
+- rule version
+- benchmark configuration
+
+14.11 Visual, Compositing, Clipping, and Stacking Contract
+Purpose. Phase 1–3 must treat visual effects and paint/compositing behavior as structured source data, not screenshot-only styling. Geometry correctness alone is insufficient for gradients, shadows, blur, masks, blend modes, clipping, or stacking order.
+Rule: every supported visual feature is represented in canonical IR, deterministically compiled, rendered in the frozen Chromium environment, and accepted only after comparison. Unsupported or non-deterministic features must be reported explicitly as unresolved; they must never be silently replaced by a visually convenient approximation.
+14.11.1 VisualIR
+interface VisualIR {  fills: FillIR[];  strokes: StrokeIR[];  gradients?: GradientIR[];  shadows?: ShadowIR[];  blur?: BlurIR;  compositing?: CompositingIR;  clip?: ClipIR;  masks?: MaskIR[];  filters?: FilterIR[];  radius?: RadiusIR;  opacity: number;}
+VisualIR is source-of-truth structure. Generated CSS/SVG is a derived representation and must not become the canonical state.
+14.11.2 GradientIR
+interface GradientIR {  type: "LINEAR" | "RADIAL" | "ANGULAR" | "DIAMOND";  stops: { position:number; color:RGBA; }[];  angle?: number;  center?: { x:number; y:number };  radius?: { x:number; y:number };}
+Linear/radial gradients are mapped from measured Figma parameters. Stop order, stop positions, colors, angle/center, and bounds are preserved. Candidate search may adjust only explicitly permitted parameters when Chromium evidence shows a mismatch.
+14.11.3 ShadowIR and EffectIR
+interface ShadowIR {  type: "DROP" | "INNER";  color: RGBA;  offsetX:number;  offsetY:number;  blur:number;  spread?:number;}
+Multiple shadows preserve source order. CSS box-shadow/text-shadow/filter mappings are selected from deterministic supported mappings; unsupported effect types become UNRESOLVED_RENDERING.
+14.11.4 Blur, Filters, and Backdrop Effects
+Blur must distinguish object blur, layer/filter blur, and backdrop blur because they produce different compositing behavior. The compiler must not substitute one for another merely because the screenshot is locally similar.
+interface BlurIR {  type: "LAYER" | "OBJECT" | "BACKGROUND";  radius:number;}interface FilterIR {  type:string;  value:number|string;}
+14.11.5 CompositingIR
+interface CompositingIR {  opacity:number;  blendMode:string;  isolation:boolean;}
+Blend mode, opacity, and isolation participate in visual correctness. A candidate that fixes geometry but changes compositing is a regression unless the reference evidence supports that change.
+14.11.6 Clip and Mask Contract
+interface ClipIR {  type: "RECT" | "PATH" | "RADIUS";  geometry?: unknown;}interface MaskIR {  type: "ALPHA" | "LUMINANCE" | "PATH";  referenceNodeId?: string;}
+Clipping/masking must preserve containment semantics. overflow:hidden, clip-path, CSS masks, or SVG clipping are valid only when source evidence supports the corresponding behavior.
+14.11.7 StackingIR
+interface StackingIR {  position: "static" | "relative" | "absolute" | "fixed" | "sticky";  zIndex: number | "auto";  stackingContext: boolean;  paintOrder: number;}
+The engine must explicitly model stacking context, z-index, DOM/paint order, and positioned descendants. Visual overlap is not considered solved merely because node geometry matches.
+14.11.8 Visual Feature Capability Tiers
+Tier A — deterministic CSS/SVG: supported when parameters map directly to a stable browser representation. Tier B — bounded approximation: allowed only when the approximation is represented explicitly, search space is bounded, and browser comparison validates improvement. Tier C — unresolved: used when no deterministic equivalent is available or the source behavior depends on unsupported rendering semantics.
+Tier C cases must enter the unresolved taxonomy as UNRESOLVED_RENDERING, UNRESOLVED_ASSET, or UNRESOLVED_SOURCE_AMBIGUITY as appropriate. No hidden screenshot-tracing fallback is permitted.
+14.11.9 Composite Visual Feature Handling
+For nested effects such as gradient + image + overlay + blur + mask + shadow + absolute badge, the engine must evaluate the complete paint/compositing chain after deterministic structural compilation. The root-cause engine may then isolate the smallest node/ancestor responsible for the diff before generating a patch.
+The implementation must preserve separation between layout correctness, paint correctness, compositing correctness, and stacking correctness so that a paint fix cannot silently mutate layout semantics.
+15. Comparison and Scoring Specification
+15.1 Screenshot normalization
+Reference and candidate images must be normalized to identical pixel dimensions and DPR semantics before comparison. Alpha treatment, background, and color representation are taken from the reference artifact, never inferred independently during scoring.
+15.2 Visual-diff algorithm
+1. Validate dimensions and image metadata.
+2. Normalize alpha/background according to the reference artifact.
+3. Compute absolute per-pixel color error with an anti-alias tolerance.
+4. Produce a binary error mask using the configured threshold.
+5. Merge nearby error pixels into diff regions.
+6. Compute region area, bounding box, severity, and nearest NodeIR ownership.
+7. Produce a perceptual similarity score for large-area structural differences.
+8. Persist raw diff artifacts and normalized metrics.
+9. Never discard a diff solely because it is difficult to explain.
+15.3 Geometry comparison
+For each matched node:
+  dx = candidate.x - reference.x
+  dy = candidate.y - reference.y
+  dw = candidate.width - reference.width
+  dh = candidate.height - reference.height
+
+Relative diagnosis uses:
+  dxRel = candidate.relative.x - reference.relative.x
+  dyRel = candidate.relative.y - reference.relative.y
+  dwRel = candidate.relative.width - reference.relative.width
+  dhRel = candidate.relative.height - reference.relative.height
+
+Absolute geometry remains the final verification metric.
+15.4 Fidelity score v1
+The scoring mechanism is frozen for implementation, while weights remain benchmark-calibratable within a versioned scoring profile. Initial profile: Geometry 20%, Layout 20%, Typography 15%, Style 15%, Assets 10%, Perceptual Visual Diff 20%.
+Fidelity =
+  0.20 * Geometry +
+  0.20 * Layout +
+  0.15 * Typography +
+  0.15 * Style +
+  0.10 * Assets +
+  0.20 * Perceptual
+
+Each component is normalized to [0,100].
+Final score is rounded to two decimals.
+Score profile ID is recorded in every report.
+Weights may change only by incrementing the scoring-profile version and recording the benchmark-based justification. Historical results remain tied to the profile that produced them.
+15.5 Score acceptance rules
+A candidate is eligible for commit only when:
+  scoreAfter > scoreBefore + improvementThreshold
+  AND no critical regression exists
+  AND candidate is valid
+  AND render completed under the readiness contract
+
+Default improvementThreshold = 0.05 score points.
+Critical regression = any hard responsive failure, missing required asset/font,
+invalid DOM mapping, or material degradation in a protected region.
+15.6 Robustness score
+Robustness is reported separately and must never be averaged into Fidelity. It is computed across responsive and dynamic-content scenarios, with hard failures for overflow, collision, broken aspect ratio, horizontal scrolling, and other benchmark-defined critical defects.
+Robustness report fields
+- responsiveCoverage
+- overflowViolations
+- collisionViolations
+- unexpectedWraps
+- containerInstability
+- horizontalScrollViolations
+- aspectRatioViolations
+- dynamicContentViolations
+- robustnessScore [0,100]
+- criticalFailures []
+
+16. Optimizer Specification
+16.1 Root-cause diagnosis algorithm
+Input: diff regions + node ownership + relative geometry
+
+1. Cluster nearby diff regions.
+2. Map each region to affected nodes.
+3. Walk from each affected node to its parent and ancestors.
+4. Identify the smallest common ancestor that explains the error pattern.
+5. Classify root cause:
+POSITION | SIZE | GAP | PADDING | ALIGNMENT | TYPOGRAPHY | PAINT | GRADIENT | SHADOW | BLUR | CLIP_MASK | COMPOSITING | STACKING | TRANSFORM | CONSTRAINT | ASSET | CONTENT_FLOW | RESPONSIVE | UNKNOWN
+6. Emit an evidence record containing before/after geometry and region coverage.
+7. Generate only hypotheses permitted by mutation boundaries.
+16.1A Root-cause → unresolved taxonomy mapping (normative)
+Root-cause classes
+Unresolved taxonomy bucket
+Canonical routing / rationale
+POSITION | SIZE | GAP | PADDING | ALIGNMENT | CONSTRAINT | CONTENT_FLOW
+UNRESOLVED_LAYOUT
+Layout/constraint/flow behavior; validate across required breakpoints when applicable.
+TYPOGRAPHY
+UNRESOLVED_TYPOGRAPHY
+Font, text metrics, wrapping, line-height, weight/style, or text-layout semantics.
+ASSET
+UNRESOLVED_ASSET
+Missing, ambiguous, corrupt, substituted, or unsupported asset source.
+PAINT | GRADIENT | SHADOW | BLUR | CLIP_MASK | COMPOSITING | STACKING | TRANSFORM
+UNRESOLVED_RENDERING
+Visual/compositing/paint semantics are unresolved or unsupported; deterministic diagnosis remains first.
+RESPONSIVE
+UNRESOLVED_RESPONSIVE
+Breakpoint-specific, cross-viewport, or dynamic-flow failure that remains after candidate search.
+MAPPING
+UNRESOLVED_MAPPING
+Source-to-CSS/HTML semantic mapping is unclear even when source data is present.
+UNKNOWN
+UNRESOLVED_SOURCE_AMBIGUITY
+Root cause cannot be classified confidently or source intent is ambiguous; human review is the default disposition.
+16.2 Patch contract
+interface Patch {
+  id: string;
+  targetNodeId: string;
+  targetScope: "NODE" | "PARENT" | "ANCESTOR";
+  property: string;
+  oldValue: unknown;
+  newValue: unknown;
+  reason: string;
+  evidence: Evidence[];
+  scoreBefore: number;
+  scoreAfter?: number;
+  robustnessBefore?: number;
+  robustnessAfter?: number;
+  parentVersionId: string;
+  status: "PROPOSED"|"APPLIED"|"EVALUATED"|"COMMITTED"|"ROLLED_BACK"|"REJECTED";
+}
+16.3 Patch state machine
+PROPOSED -> APPLIED -> EVALUATED
+EVALUATED -> COMMITTED       when acceptance rules pass
+EVALUATED -> ROLLED_BACK     when score/regression rules fail
+PROPOSED -> REJECTED         when schema/boundary validation fails
+APPLIED -> ROLLED_BACK       on runtime/render failure
+16.4 Mutation boundaries
+Class
+Properties / mutations
+Required condition
+Allowed
+padding, gap, width, max-width, height, line-height, min-width, min-height, margin, align-items, justify-content, flex sizing; bounded gradient angle/stop position, shadow blur/offset/spread, opacity
+Source-supported or bounded parameter adjustment; must still pass §15.5 acceptance and responsive validation.
+Conditionally allowed
+layout mode, component boundary, DOM structure, content, asset source; source-supported z-index/stacking alternatives, blend/isolation, transform/rotation values
+Strong source/evidence support required; smallest affected scope; protected-region and responsive validation required.
+Restricted
+stacking-context creation, DOM paint-order changes, clip/mask strategy changes, effect-type changes, asset substitution
+Only when the source semantics require the change and deterministic evidence isolates it; protected-region validation is mandatory.
+Forbidden by default
+random absolute positioning, arbitrary transforms, arbitrary z-index, arbitrary blend-mode/clip/mask injection, full-tree rewrites
+Not permitted as screenshot-tracing fixes. Any exception requires an explicit versioned rule/ADR with source evidence.
+16.5 Candidate generation
+Width:
+  fixedPx, 100%, 100%+maxWidth, flex-based
+Gap:
+  measuredValue, measuredValue +/- bounded nearby deltas
+Alignment:
+  start, center, end, stretch
+Height:
+  auto, fixed, min-height, aspect-ratio
+
+Only one hypothesis dimension changes at a time unless an explicit coupled-rule
+Visual:  gradientAngle ± bounded delta; gradientStopPosition ± bounded delta;  shadowOffset/blur/spread ± bounded delta; opacity ± bounded deltaStacking:  source-supported zIndex alternatives; paint-order alternatives only when evidence permitsTransform:  rotation/matrix alternatives only when TransformIR indicates a transformConstraints:  bounded anchor/scale/stretch alternatives validated across required breakpointsCandidate generation must preserve source feature type. A gradient candidate cannot become a flat fill; a stacking candidate cannot become arbitrary absolute positioning.
+is registered. Candidate ordering is deterministic.
+16.6 Beam search
+Eligibility invariant: candidates are admitted to the beam only after §15.5 acceptance checks pass. A higher raw Fidelity score cannot outrank an ineligible candidate.
+initialBeam = [initialVersion]
+beamWidth = 3
+maxIterations = 20
+
+for each iteration:
+  expand each version with deterministic candidates
+  cheap-filter candidates using DOM/geometry constraints
+  render survivors in Chromium
+  score survivors
+  keep the top beamWidth valid versions by:
+    1. higher Fidelity
+    2. higher Robustness when Fidelity ties
+    3. lower patch count when both tie
+    4. lexicographically smaller patch ID as final deterministic tiebreaker
+
+return globally best observed version
+16.7 Cache contract
+cacheKey = hash(
+  sourceHash, frameHash, designHash, IRHash,
+  viewport, DPR, fontHash, assetHash,
+  generatorVersion, ruleVersion, scoringProfile,
+  candidatePatch, environmentHash
+)
+A cache hit is valid only when every key component matches exactly. Cache entries contain score, robustness result, render artifact reference, and environment provenance.
+
+17. Responsive and Dynamic Content Validation
+17.0A Visual/Compositing Root-Cause and Candidate Rules
+Visual effects follow the same ancestor-first diagnosis contract as geometry. A diff must be classified before a mutation is generated.
+Diff pattern → candidate classColor-field mismatch → gradient/fill/opacitySoft halo mismatch → shadow/blur/filterWrong overlap → stacking/z-index/paint orderWrong visible boundary → clip/mask/radiusTransparent overlay mismatch → opacity/blend/isolationVector edge mismatch → SVG/path/stroke
+Candidate generation is type-specific and bounded. For example, a gradient candidate may vary angle or stop position within configured deltas; a shadow candidate may vary blur/offset/spread within bounded deltas; a z-index candidate may test only a small deterministic set of relative stacking alternatives.
+The optimizer must not add position:absolute, transform, overflow:hidden, or arbitrary z-index merely to reduce a screenshot diff. Such mutations require source evidence and must respect the mutation boundaries and responsive guardrails.
+Every visual candidate follows: schema validation → mutation-boundary validation → readiness-gated Chromium render → Fidelity/Robustness measurement → commit or rollback.
+17.1 Required breakpoints
+390 / 640 / 768 / 1024 / 1280 / 1440 px
+17.2 Validation rules
+No unexpected horizontal scroll.
+No collision between unrelated visible regions.
+No unexpected text wrap when the reference behavior indicates stable line structure.
+No unexpected component displacement beyond configured tolerance.
+No unstable container width/height behavior caused by optimizer patches.
+No broken aspect ratio where source evidence defines one.
+Each breakpoint produces a complete report even when one breakpoint fails.
+17.3 Dynamic-content stress suite
+Variant
+Purpose
+SHORT
+Detects overfitting to minimum content
+NORMAL
+Primary expected-content behavior
+LONG
+Detects clipping, wrap, growth, and layout instability
+EXTREME
+Controlled resilience check; never used to justify hiding content without evidence
+A stress-test patch that merely hides content is rejected unless the reference design demonstrates equivalent clipping/ellipsis behavior.
+
+18. Benchmark and Evaluation System
+18.0A Visual Complexity Validation
+Visual-complexity fixtures must include at minimum: linear/radial gradients, multiple shadows, blur/backdrop blur, clipping/masks, per-corner radius, opacity overlays, blend modes, SVG/vector shapes, and controlled stacking/z-index overlap.
+Complex fixtures should also include combinations of two or more effects to verify compositing order and interaction, not only isolated property matching.
+A visual-complexity failure is critical when it materially changes a protected region, stacking order, asset visibility, or intended effect behavior even when overall pixel score improves.
+18.1 Benchmark manifest
+{
+  "benchmarkId":"dashboard-medium-01",
+  "figmaFile":"...",
+  "nodeId":"...",
+  "referenceArtifact":"...",
+  "primaryViewport":{"width":1440,"height":900,"dpr":1},
+  "responsiveViewports":[390,640,768,1024,1280,1440],
+  "targetFidelity":95,
+  "requiredFonts":["..."],
+  "requiredAssets":["..."],
+  "dynamicContentProfile":"standard-v1"
+}
+18.2 Benchmark tiers
+Tier
+Minimum coverage
+Purpose
+Simple
+layout + typography + basic assets
+Pipeline correctness
+Medium
+nested auto-layout + mixed content + assets
+Optimizer correctness
+Complex
+deep nesting + responsive constraints + visual/compositing complexity + multiple asset/typography cases
+Release readiness
+18.3 Regression policy
+Every fixed defect becomes a permanent regression fixture.
+Any change that lowers a protected benchmark score beyond the configured tolerance blocks release.
+Benchmark results are stored with code, parser, rule, browser, font, asset, and scoring-profile provenance.
+
+19. Deterministic Build and Runtime Environment
+Required reproducibility inputs
+- source Figma file/frame version
+- parser/generator version
+- rule-set version
+- benchmark manifest version
+- scoring-profile version
+- browser + Playwright versions
+- container image digest
+- font file hashes
+- asset hashes
+- locale/timezone/color settings
+- viewport + DPR
+- dependency lockfile hash
+Recommended benchmark execution is containerized with a locked dependency graph and preinstalled benchmark fonts. Environmental drift marks the result non-comparable rather than silently merging it with historical runs.
+
+20. CLI and Configuration Contract
+20.1 CLI
+figma-engine parse --input manifest.json
+figma-engine compile --input manifest.json
+figma-engine render --run <runId>
+figma-engine compare --run <runId>
+figma-engine optimize --run <runId>
+figma-engine benchmark --suite phase1|phase2|phase3
+figma-engine report --run <runId>
+20.2 Exit codes
+Code
+Meaning
+0
+Success
+1
+General failure
+2
+Invalid input
+3
+Authentication failure
+4
+Unsupported source feature
+5
+Asset/font failure
+6
+Rendering failure
+7
+Comparison failure
+8
+Benchmark gate failure
+9
+Resource/time limit exceeded
+20.3 Engine configuration
+engine:
+  maxIterations: 20
+  scoreImprovementThreshold: 0.05
+  protectedRegressionTolerance: 0.10
+optimizer:
+  beamWidth: 3
+  maxCandidatesPerNode: 8
+renderer:
+  viewportWidth: 1440
+  viewportHeight: 900
+  dpr: 1
+  readinessTimeoutMs: 15000
+responsive:
+  breakpoints: [390,640,768,1024,1280,1440]
+limits:
+  maxNodes: 10000
+  maxDepth: 100
+  maxRuntimeSeconds: 300
+  maxPatches: 500
+21. Failure Handling, Limits, and Safety
+21.1 Typed failure classes
+INPUT_INVALID
+AUTH_FAILED
+FIGMA_RATE_LIMIT
+FIGMA_UNAVAILABLE
+NODE_NOT_FOUND
+UNSUPPORTED_NODE
+FONT_MISSING
+ASSET_MISSING
+ASSET_CORRUPT
+RENDER_TIMEOUT
+BROWSER_CRASH
+PAGE_NOT_READY
+DOM_METRICS_FAILED
+COMPARISON_FAILED
+PATCH_INVALID
+PATCH_BOUNDARY_VIOLATION
+BENCHMARK_GATE_FAILED
+RESOURCE_LIMIT_EXCEEDED
+21.2 Retry policy
+21.2A Visual/Compositing Failure Classes
+Additional typed failure classes:
+GRADIENT_MAPPING_FAILEDEFFECT_MAPPING_FAILEDBLUR_MAPPING_FAILEDMASK_MAPPING_FAILEDCLIP_MAPPING_FAILEDSTACKING_ORDER_MISMATCHUNEXPECTED_OVERLAYUNEXPECTED_COLLISIONABSOLUTE_POSITION_MISMATCHBLEND_MODE_MISMATCHPAINT_ORDER_MISMATCH
+These failures are diagnostic outcomes, not silent fallbacks. A run may continue with unresolved cases when the benchmark policy permits it, but release gates must retain the failure and provenance.
+Only transient network/API failures and browser startup failures may be retried automatically. Candidate-level scoring failures should normally reject that candidate, not restart the entire benchmark. Retries are bounded and logged with attempt number and backoff.
+21.3 Resource limits
+Maximum node count, recursion depth, optimization iterations, candidate count, patches, memory, and wall-clock runtime are configuration-controlled.
+Resource exhaustion produces a typed failure and a partial diagnostic artifact; it must not silently return a lower-quality result as success.
+Large or unbounded external content is prohibited from benchmark execution unless explicitly declared in the benchmark manifest.
+
+22. Observability and Audit Trail
+22.1 Run event schema
+{
+  "timestamp":"...",
+  "runId":"...",
+  "stage":"OPTIMIZE",
+  "event":"PATCH_EVALUATED",
+  "nodeId":"hero-content",
+  "patchId":"p-014",
+  "scoreBefore":91.22,
+  "scoreAfter":92.01,
+  "robustnessBefore":88.0,
+  "robustnessAfter":88.0,
+  "decision":"COMMITTED",
+  "durationMs":412
+}
+22.2 Required audit artifacts
+run manifest
+reference artifact
+normalized IR
+generated source
+rendered screenshots
+diff masks/regions
+patch log
+candidate results
+benchmark report
+unresolved-case log
+
+23. Testing Strategy
+Test level
+Mandatory coverage
+Unit
+IR validation, geometry math, mapping rules, candidate generation, patch validation, score functions
+Integration
+Figma data → IR → code, code → Chromium, render → compare, compare → optimizer
+Golden visual
+Reference image vs deterministic render for every benchmark fixture
+Regression
+Every fixed visual/logic defect becomes a fixture
+End-to-end
+Full Figma frame → final artifact with zero manual code edits
+Failure-path
+Missing font, missing asset, API timeout, invalid patch, browser crash, resource limit
+23.1 Golden fixture layout
+benchmark/
+  frames/
+    simple/
+      frame.json
+      reference.png
+      expected-ir.json
+    medium/
+    complex/
+  reference-artifacts/
+  reports/
+  golden/
+23.2 Test release rule
+A release candidate is blocked when unit/integration tests fail, golden visual tests regress beyond the configured threshold, the determinism check fails, or a phase gate is not met.
+
+24. Security and Data Handling
+Credentials are provided via environment/secret management and never committed to the repository.
+Figma tokens, API keys, cookies, and sensitive URLs are excluded from logs and benchmark artifacts.
+Generated HTML/CSS is treated as untrusted content and rendered in an isolated browser context/container.
+External network access is deny-by-default during benchmark execution except for explicitly required source retrieval.
+Temporary files containing source assets are cleaned according to the configured retention policy.
+Any third-party service used in AI Phase 4 receives only the minimum evidence needed for the unresolved case.
+
+25. Package Responsibilities and Internal APIs
+Package
+Responsibility
+Must not do
+figma-client
+Retrieve immutable source data and metadata
+Generate code or modify source
+figma-parser
+Normalize source into NodeIR
+Render or score
+design-ir
+Own canonical schemas/validation
+Contain optimizer heuristics
+shared-contracts
+Own versioned cross-package types and schemas
+Contain business heuristics
+font-engine
+Resolve, hash, and validate fonts
+Silently substitute fonts
+asset-engine
+Download, hash, validate, and cache assets
+Embed uncontrolled external assets
+code-generator
+Generate deterministic HTML/CSS
+Call AI or mutate source directly
+renderer
+Launch/reuse Chromium and capture ready renders
+Change generated source semantics
+geometry-engine
+Compute/match geometry
+Make code changes
+visual-engine
+Compare images and produce diff regions
+Patch code
+root-cause-engine
+Explain diff patterns
+Render candidates
+patch-engine
+Apply/reverse validated patches
+Invent unvalidated mutations
+optimizer
+Select and evaluate deterministic candidates
+Bypass measurement
+layout-solver
+Generate bounded type-specific candidates
+Perform arbitrary rewrites
+responsive-engine
+Run breakpoint validation
+Hide failures
+flow-engine
+Run dynamic-content stress tests
+Change source without a patch
+benchmark
+Manage fixtures, manifests, reports, gates
+Use uncontrolled external data
+25.1 Package boundary rule
+25.0A Visual Package Responsibilities
+visual-engine: image comparison, diff regions, perceptual metrics; must not generate CSS.
+paint-engine: normalize fills, gradients, strokes, shadows, and paint order; must not score renders.
+compositing-engine: normalize opacity, blend mode, isolation, blur, and backdrop behavior; must not bypass renderer validation.
+clipping-engine: normalize clipping and masks; must preserve source semantics.
+stacking-engine: compute stacking contexts, z-index relationships, paint order, and overlap diagnostics; must not invent layout changes.
+effect-engine: map supported visual effects into deterministic CSS/SVG/filter primitives; unsupported effects become typed unresolved cases.
+All package-to-package contracts are typed, versioned, and covered by contract tests. A package may not depend on internal implementation details of another package when a published schema/API exists.
+
+26. Final Project Structure
+Visual/compositing packages required by the v5 contract:
+├── paint-engine/├── compositing-engine/├── clipping-engine/├── stacking-engine/└── effect-engine/
+These packages are deterministic compiler/diagnostic components for Phase 1–3. They are not AI packages and do not bypass Chromium measurement.
+figma-to-code/
+├── apps/
+│   └── cli/
+├── packages/
+│   ├── figma-client/
+│   ├── figma-parser/
+│   ├── design-ir/
+│   ├── shared-contracts/
+│   ├── font-engine/
+│   ├── asset-engine/
+│   ├── code-generator/
+│   ├── renderer/
+│   ├── geometry-engine/
+│   ├── visual-engine/
+│   ├── root-cause-engine/
+│   ├── patch-engine/
+│   ├── optimizer/
+│   ├── layout-solver/
+│   ├── responsive-engine/
+│   ├── flow-engine/
+│   └── benchmark/
+├── benchmark/
+│   ├── frames/
+│   ├── reference-artifacts/
+│   ├── golden/
+│   └── reports/
+├── configs/
+│   ├── engine.yaml
+│   └── scoring/
+├── scripts/
+└── docs/
+Phase 4 packages are added only after the deterministic exit gate and remain behind explicit interfaces: ai-router, model-adapters, vision-analyzer, design-intent-engine, patch-proposer, schema-validator, prompt-registry, ai-evaluation-cache, and human-review-queue.
+
+27. Development Milestones and Sequence
+Milestone
+Deliverable
+Gate
+M0
+Repository + contracts + benchmark fixtures
+Build/test infrastructure green
+M1
+Figma extraction + NodeIR
+3 fixtures parse deterministically
+M2
+HTML/CSS compiler + renderer
+Ready screenshot + reproducible run
+M3
+Geometry + visual comparison
+Real score + diff regions
+M4
+Root-cause + patch engine
+Reversible deterministic patch loop
+M5
+Phase 2 optimizer
+≥90% average benchmark fidelity
+M6
+Phase 3 candidate search
+Best-version guarantee + bounded beam search
+M7
+Responsive + dynamic validation
+No unresolved critical responsive failures on required fixtures
+M8
+Phase 3 release gate
+≥95% primary-breakpoint average on release benchmark
+M9
+Phase 4 AI integration
+Only unresolved-case escalation; no AI bypass
+M10
+Production hardening
+Security, observability, limits, reproducibility, release automation
+M7A
+Visual + compositing solver
+Gradient/effect/stacking/mask/transform/constraint fixtures pass deterministic validation or are explicitly unresolved
+27.1 First implementation sprint
+Do only:
+1. shared-contracts + schemas
+2. benchmark fixture format
+3. figma-client
+4. figma-parser
+5. design-ir validation
+6. renderer shell with readiness gate
+7. minimal HTML/CSS generator
+8. one 1440x900 benchmark frame end-to-end
+
+Do not implement React, Tailwind, AI routing, broad responsive solving,
+or production cleanup before M1-M3 are green.
+
+28. Phase Exit Gates - Machine-Checkable
+Gate
+Required result
+Phase 1
+3 benchmark frames complete; deterministic score generated; reference/render contracts valid
+Phase 2
+≥90% average Fidelity across full benchmark set; zero manual edits; patch rollback verified
+Phase 3
+≥95% average Fidelity at primary breakpoint; required responsive and visual-compositing failure lists are empty for release fixtures; best-version guarantee verified; no protected-region stacking/effect regression.
+Phase 4
+AI only consumes unresolved cases; schema validation 100%; every accepted AI patch passes mutation-boundary validation, browser measurement, responsive validation, protected-region checks, and rollback; separate Fidelity/Robustness provenance retained.
+28.1 Gate command contract
+figma-engine benchmark --suite phase1 --gate
+figma-engine benchmark --suite phase2 --gate
+figma-engine benchmark --suite phase3 --gate
+figma-engine benchmark --suite phase4 --gate
+A gate command returns exit code 0 only when all mandatory criteria pass. A documented exception requires an ADR and cannot silently change the gate.
+
+29. Phase 4 AI - Final Controlled Contract
+The existing AI architecture remains authoritative: deterministic compilation, browser rendering, comparison, optimizer, and rollback decide correctness; AI only proposes structured interpretations and patches.
+29.1 AI invocation budget
+Per unresolved case defaults
+- max primary-model calls: 1
+- max fallback-model calls: 1
+- max disagreement proposals: 2
+- max total evaluated AI candidates: 4
+- timeout per model call: configured, bounded
+- low-confidence threshold: 0.70
+- high-impact disagreement: independent second proposal required
+29.2 AI evidence packet
+AI receives only:
+- unresolved case type
+- target NodeIdentity
+- relevant IR subset
+- relative/absolute geometry diff
+- screenshot crop/overlay
+- relevant benchmark/reference metadata
+- attempted deterministic candidates
+- current scores
+
+AI does not receive open-ended live-project mutation authority.
+29.3 AI patch schema
+{
+  "targetNode":"hero-content",
+  "property":"gap",
+  "oldValue":"16px",
+  "newValue":"24px",
+  "reason":"Reference spacing exceeds current spacing",
+  "evidence":["diff-region-12","relative-geometry-gap"],
+  "confidence":0.91,
+  "expectedEffect":"increase vertical separation",
+  "alternatives":["20px","22px"]
+}
+29.4 AI acceptance rule
+AI proposal
+  -> schema validation
+  -> mutation-boundary validation
+  -> candidate application
+  -> font/asset readiness
+  -> Chromium render
+  -> Fidelity + Robustness evaluation
+  -> commit only on improvement without critical regression
+  -> otherwise rollback/reject
+
+30. Architecture Decision Rules (ADRs)
+ADR
+Decision
+ADR-001
+Chromium measurement is the authoritative acceptance mechanism
+ADR-002
+Relative geometry is used for diagnosis; absolute geometry for final verification
+ADR-003
+Patch-based rollback replaces full-project snapshots
+ADR-004
+Deterministic candidate search precedes AI escalation
+ADR-005
+AI cannot directly mutate source or bypass validation
+ADR-006
+Fidelity and Robustness are separate release metrics
+ADR-007
+Third-party tools may accelerate retrieval/reference work only when pinned and auditable
+ADR-008
+Benchmark artifacts and environment are versioned inputs, not incidental metadata
+ADR-009
+Unsupported source features are explicit failures/unresolved cases, never silent approximations
+ADR-010
+Historical benchmark results remain tied to their scoring/environment profile
+ADR-011
+Root-cause classes map to the seven unresolved taxonomy buckets only through the normative §16.1A mapping table; no package may invent a different routing category.
+ADR-012
+Phase 4 AI proposal generation is non-deterministic by default; reproducibility applies to frozen proposals/caches and to the deterministic acceptance, validation, rollback, and release pipeline.
+ADR-013
+Candidate isolation includes CSS and mutable browser state; reused Chromium contexts must clear/block/recreate browser state so candidate evaluations are independent.
+30.1 Change-control rule
+Any change that alters IR semantics, scoring, patch semantics, candidate ordering, rendering environment, benchmark interpretation, or AI contracts requires a versioned ADR or schema/rule version bump. This prevents accidental architectural drift.
+
+31. Final Definition of Done
+The project is considered implementation-complete for a phase only when all applicable conditions below are true:
+All required schemas and package contracts are versioned and validated.
+Benchmark fixtures exist for simple, medium, and complex tiers.
+The deterministic environment is reproducible and recorded.
+Unit, integration, golden visual, regression, failure-path, and end-to-end tests pass.
+No accepted optimizer patch bypasses measurement, mutation boundaries, or rollback.
+Every benchmark result has complete provenance and audit artifacts.
+No manual source edits are required between optimization runs.
+Unsupported inputs fail explicitly and are represented in the unresolved taxonomy where applicable.
+Phase gates are executable through the CLI and return deterministic exit codes.
+Phase 4 AI remains strictly subordinate to the deterministic acceptance system.
+Security, credentials, resource limits, and data-retention rules are documented and enforced.
+31.2 Final project principle
+31.1 Visual Fidelity Definition of Done
+Visual fidelity is not considered complete unless supported geometry/layout, gradients, fills/strokes, shadows/effects, blur, clipping/masking, opacity/blend modes, SVG/vector rendering, transforms/rotation, Figma constraints, and stacking/overlay behavior pass their dedicated benchmark fixtures or are explicitly classified as unresolved.
+For every accepted visual patch, the audit trail must record the source visual feature, target NodeIdentity, before/after render evidence, candidate property, Fidelity/Robustness delta, and commit/rollback decision.
+The deliverable is a deterministic, browser-verified reverse-engineering compiler with a controlled search-based optimizer and a bounded AI escalation layer. The implementation must optimize for measurable fidelity, reproducibility, debuggability, reversibility, and robust responsive behavior rather than screenshot-matching tricks or uncontrolled LLM generation.
+32. Master Scope and Gap-Control Contract
+32.1 Supported Design-Semantics Matrix
+Phase 1–3 deterministic scope explicitly covers geometry, auto-layout, grid-like structures, typography/font readiness, assets, gradients, fills/strokes, shadows/effects, blur classes, opacity, blend/isolation, clipping, masks, SVG/vector, transforms/rotation, stacking/z-index/paint order, Figma constraints, responsive breakpoints, dynamic-content flow, and visual regression. Each capability must either have a deterministic mapping plus browser validation or be explicitly classified as unresolved.
+32.2 No-Silent-Approximation Rule
+The implementation may not silently replace unsupported or ambiguous Figma semantics with arbitrary absolute positioning, transforms, z-index values, overflow hiding, asset substitution, DOM rewrites, or fabricated visual effects. Every approximation must be source-supported, bounded, versioned, rendered, measured, and rollback-safe; otherwise the case enters the unresolved taxonomy.
+32.3 Cross-Phase Contract
+Phase 1 owns source extraction, canonical IR, deterministic rendering, and reference contracts. Phase 2 owns ancestor-first diagnosis and reversible bounded patches. Phase 3 owns deterministic candidate search, visual/compositing solving, responsive/constraint validation, and global-best selection. Phase 4 owns only unresolved-case interpretation and structured proposals; it never becomes the renderer of record.
+32.4 Release Gate Completeness
+A phase cannot be declared complete from Fidelity alone. The required gate must include applicable correctness, robustness, protected-region, unsupported-feature, determinism, audit-trail, and regression criteria. A benchmark result with an unexplained failure, environmental drift, or silent approximation is not a valid success.
+32.5 Engineering Deliverable Boundary
+This PRD is the authoritative product/architecture contract. Package-level engineering specifications may define algorithms, data structures, browser APIs, exact candidate deltas, and implementation mechanics only when they preserve the contracts here. Any change to semantics, scoring, candidate ordering, mutation boundaries, rendering environment, or AI authority requires a versioned ADR or schema/rule version bump.
+Version v7 closes the identified cross-contract gaps in v6: reconciled mutation tiers, canonical root-cause taxonomy mapping, complete AI routing, explicit best-version eligibility, structural identity reconciliation, full candidate browser-state isolation, and an explicit Phase 4 determinism boundary.
