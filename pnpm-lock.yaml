@@ -247,11 +247,19 @@ importers:
 
   packages/clipping-engine: {}
 
-  packages/code-generator: {}
+  packages/code-generator:
+    dependencies:
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/compositing-engine: {}
 
-  packages/design-ir: {}
+  packages/design-ir:
+    dependencies:
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/effect-engine: {}
 

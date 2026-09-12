@@ -1,15 +1,10 @@
 import { createHash } from "node:crypto";
 import type { FigmaApiNode } from "@figma-engine/figma-client";
-import type { NodeIR, Rect, TypographyIR } from "@figma-engine/shared-contracts";
+import type { DesignDocument, NodeIR, Rect, TypographyIR } from "@figma-engine/shared-contracts";
 import { mapNodeType } from "./map-node-type.js";
 import { mapLayout } from "./map-layout.js";
 import { mapPaints } from "./map-paint.js";
 import { mapRadius } from "./map-radius.js";
-
-export interface ParsedDocument {
-  rootId: string;
-  nodes: Record<string, NodeIR>;
-}
 
 export interface ParseContext {
   figmaFileVersion: string;
@@ -64,7 +59,7 @@ function extractTypography(node: FigmaApiNode): TypographyIR | undefined {
 // PRD §4.2/§4.4: every node gets a stable identity and both absolute and parent-relative
 // geometry from the very first parse. Traversal order is deterministic (pre-order DFS over
 // Figma's own child order), so internalId assignment is reproducible for a fixed source tree.
-export function parseDocument(root: FigmaApiNode, context: ParseContext): ParsedDocument {
+export function parseDocument(root: FigmaApiNode, context: ParseContext): DesignDocument {
   const nodes: Record<string, NodeIR> = {};
   let counter = 0;
 
