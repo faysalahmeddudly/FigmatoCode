@@ -303,7 +303,11 @@ importers:
 
   packages/responsive-engine: {}
 
-  packages/root-cause-engine: {}
+  packages/root-cause-engine:
+    dependencies:
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/shared-contracts:
     dependencies:
