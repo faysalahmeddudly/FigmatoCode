@@ -72,6 +72,30 @@ describe("parseDocument", () => {
     });
   });
 
+  it("derives italic from Figma's combined fontStyle string, not a boolean field", () => {
+    // Confirmed against a live Figma API response: style.fontStyle is a string like
+    // "Regular" or "Italic" / "Bold Italic", there is no separate style.italic boolean.
+    const italicFixture: FigmaApiNode = {
+      ...fixture,
+      children: [
+        {
+          id: "1:2",
+          name: "Emphasis",
+          type: "TEXT",
+          absoluteBoundingBox: { x: 0, y: 0, width: 10, height: 10 },
+          style: { fontFamily: "Inter", fontWeight: 400, fontSize: 12, fontStyle: "Bold Italic" },
+        },
+      ],
+    };
+
+    const { nodes } = parseDocument(italicFixture, {
+      figmaFileVersion: "v1",
+      parserVersion: "0.0.0",
+    });
+
+    expect(nodes["n1"]?.typography?.fontStyle).toBe("italic");
+  });
+
   it("throws UnsupportedNodeError for unmapped node types", () => {
     const withStar: FigmaApiNode = {
       ...fixture,

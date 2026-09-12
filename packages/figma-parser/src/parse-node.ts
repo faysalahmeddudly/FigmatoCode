@@ -4,6 +4,7 @@ import type { NodeIR, Rect, TypographyIR } from "@figma-engine/shared-contracts"
 import { mapNodeType } from "./map-node-type.js";
 import { mapLayout } from "./map-layout.js";
 import { mapPaints } from "./map-paint.js";
+import { mapRadius } from "./map-radius.js";
 
 export interface ParsedDocument {
   rootId: string;
@@ -37,7 +38,9 @@ function extractTypography(node: FigmaApiNode): TypographyIR | undefined {
     | {
         fontFamily?: string;
         fontWeight?: number;
-        italic?: boolean;
+        // Figma's REST API reports style as a combined string ("Regular", "Italic",
+        // "Bold Italic", ...), not a separate boolean -- confirmed against a live response.
+        fontStyle?: string;
         fontSize?: number;
         lineHeightPx?: number;
         letterSpacing?: number;
@@ -49,7 +52,7 @@ function extractTypography(node: FigmaApiNode): TypographyIR | undefined {
   return {
     fontFamily: style.fontFamily,
     fontWeight: style.fontWeight ?? 400,
-    fontStyle: style.italic ? "italic" : "normal",
+    fontStyle: style.fontStyle?.toLowerCase().includes("italic") ? "italic" : "normal",
     fontSize: style.fontSize,
     lineHeight: style.lineHeightPx,
     letterSpacing: style.letterSpacing,
@@ -101,6 +104,7 @@ export function parseDocument(root: FigmaApiNode, context: ParseContext): Parsed
       typography: extractTypography(node),
       fills: fills.length > 0 ? fills : undefined,
       strokes,
+      radius: mapRadius(node),
       component: node.componentId ? { instanceOfComponentId: node.componentId } : undefined,
       source: {
         figmaNodeType: node.type,
