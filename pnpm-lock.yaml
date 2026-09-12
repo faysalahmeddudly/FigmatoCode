@@ -254,7 +254,14 @@ importers:
 
   packages/figma-client: {}
 
-  packages/figma-parser: {}
+  packages/figma-parser:
+    dependencies:
+      '@figma-engine/figma-client':
+        specifier: workspace:*
+        version: link:../figma-client
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/flow-engine: {}
 
