@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+output/
+benchmark/reports/*
+!benchmark/reports/.gitkeep
+.DS_Store
+Thumbs.db

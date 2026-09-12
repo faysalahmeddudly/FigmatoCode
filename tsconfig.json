@@ -1,0 +1,28 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/shared-contracts" },
+    { "path": "packages/figma-client" },
+    { "path": "packages/figma-parser" },
+    { "path": "packages/design-ir" },
+    { "path": "packages/font-engine" },
+    { "path": "packages/asset-engine" },
+    { "path": "packages/code-generator" },
+    { "path": "packages/renderer" },
+    { "path": "packages/geometry-engine" },
+    { "path": "packages/visual-engine" },
+    { "path": "packages/root-cause-engine" },
+    { "path": "packages/patch-engine" },
+    { "path": "packages/optimizer" },
+    { "path": "packages/layout-solver" },
+    { "path": "packages/responsive-engine" },
+    { "path": "packages/flow-engine" },
+    { "path": "packages/benchmark" },
+    { "path": "packages/paint-engine" },
+    { "path": "packages/compositing-engine" },
+    { "path": "packages/clipping-engine" },
+    { "path": "packages/stacking-engine" },
+    { "path": "packages/effect-engine" },
+    { "path": "apps/cli" }
+  ]
+}

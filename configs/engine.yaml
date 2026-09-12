@@ -1,0 +1,19 @@
+engine:
+  maxIterations: 20
+  scoreImprovementThreshold: 0.05
+  protectedRegressionTolerance: 0.10
+optimizer:
+  beamWidth: 3
+  maxCandidatesPerNode: 8
+renderer:
+  viewportWidth: 1440
+  viewportHeight: 900
+  dpr: 1
+  readinessTimeoutMs: 15000
+responsive:
+  breakpoints: [390, 640, 768, 1024, 1280, 1440]
+limits:
+  maxNodes: 10000
+  maxDepth: 100
+  maxRuntimeSeconds: 300
+  maxPatches: 500
