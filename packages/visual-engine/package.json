@@ -13,5 +13,14 @@
   },
   "scripts": {
     "build": "tsc -b"
+  },
+  "dependencies": {
+    "@figma-engine/shared-contracts": "workspace:*",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/pixelmatch": "^7.1.0",
+    "@types/pngjs": "^6.0.5"
   }
 }
