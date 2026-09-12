@@ -117,6 +117,13 @@ describe("generateCss", () => {
     expect(css).not.toMatch(/\.n-n1 \{[^}]*position: absolute;/s);
   });
 
+  it("preserves Figma's authored line breaks instead of letting HTML collapse them", () => {
+    // Confirmed against a live Figma text node: `characters` embeds real "\n"s for
+    // paragraph breaks, which the browser's default white-space:normal would collapse to
+    // a single space, silently flattening the design's paragraph structure.
+    expect(css).toMatch(/\.n-n1 \{[^}]*white-space: pre-line;/s);
+  });
+
   it("absolutely positions a child of a non-auto-layout parent using relative geometry", () => {
     expect(css).toMatch(/\.n-n3 \{[^}]*position: absolute;/s);
     expect(css).toMatch(/\.n-n3 \{[^}]*left: 24px;/s);

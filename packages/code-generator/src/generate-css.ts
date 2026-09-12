@@ -83,6 +83,11 @@ function typographyDeclarations(node: NodeIR): Record<string, string> {
     "font-style": t.fontStyle,
     "font-size": `${t.fontSize}px`,
     margin: "0",
+    // Figma's `characters` field embeds the author's actual line breaks as literal "\n"s
+    // (confirmed against the live Charles-Prints text node); HTML's default white-space
+    // collapses those to a single space, silently discarding authored paragraph structure.
+    // pre-line preserves line breaks while still wrapping and collapsing runs of spaces.
+    "white-space": "pre-line",
   };
   if (t.lineHeight !== undefined) decl["line-height"] = `${t.lineHeight}px`;
   if (t.letterSpacing !== undefined) decl["letter-spacing"] = `${t.letterSpacing}px`;
