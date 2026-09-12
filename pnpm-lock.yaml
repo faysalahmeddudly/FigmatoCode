@@ -293,7 +293,11 @@ importers:
 
   packages/paint-engine: {}
 
-  packages/patch-engine: {}
+  packages/patch-engine:
+    dependencies:
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/renderer:
     dependencies:
