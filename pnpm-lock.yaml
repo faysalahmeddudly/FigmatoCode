@@ -289,7 +289,17 @@ importers:
 
   packages/layout-solver: {}
 
-  packages/optimizer: {}
+  packages/optimizer:
+    dependencies:
+      '@figma-engine/patch-engine':
+        specifier: workspace:*
+        version: link:../patch-engine
+      '@figma-engine/root-cause-engine':
+        specifier: workspace:*
+        version: link:../root-cause-engine
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/paint-engine: {}
 

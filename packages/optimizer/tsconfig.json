@@ -5,5 +5,9 @@
     "rootDir": "src"
   },
   "include": ["src"],
-  "references": []
+  "references": [
+    { "path": "../shared-contracts" },
+    { "path": "../patch-engine" },
+    { "path": "../root-cause-engine" }
+  ]
 }
