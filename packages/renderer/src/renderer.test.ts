@@ -72,4 +72,25 @@ describe("Renderer", () => {
 
     expect(second.title).toBe("empty");
   }, 30000);
+
+  it("measures every n-<id> element's DOM rect for geometry comparison", async () => {
+    const htmlPath = join(dir, "metrics.html");
+    writeFileSync(
+      htmlPath,
+      `<!doctype html><html><body style="margin:0">
+        <div class="n-n0" style="position:relative;width:200px;height:100px">
+          <div class="n-n1" style="position:absolute;left:10px;top:20px;width:50px;height:30px"></div>
+        </div>
+      </body></html>`,
+    );
+
+    const result = await renderer.render({
+      htmlPath,
+      viewport: { width: 200, height: 100 },
+      screenshotPath: join(dir, "metrics.png"),
+    });
+
+    expect(result.domMetrics.n0).toEqual({ x: 0, y: 0, width: 200, height: 100 });
+    expect(result.domMetrics.n1).toEqual({ x: 10, y: 20, width: 50, height: 30 });
+  }, 30000);
 });

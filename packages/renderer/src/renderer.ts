@@ -13,9 +13,17 @@ export interface RenderOptions {
   readinessTimeoutMs?: number;
 }
 
+export interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface RenderResult {
   screenshotPath: string;
   title: string;
+  domMetrics: Record<string, Rect>;
 }
 
 export interface RenderProvenance {
@@ -83,7 +91,27 @@ export class Renderer {
       );
 
       await page.screenshot({ path: options.screenshotPath });
-      return { screenshotPath: options.screenshotPath, title: await page.title() };
+
+      // PRD §4 pipeline step "Chromium -> DOM metrics": measured for every element whose
+      // class encodes a node identity (code-generator's "n-<internalId>" convention, §14.7),
+      // relative to the page's own scroll-adjusted origin so it lines up with geometry-engine's
+      // frame-local coordinate space.
+      const domMetrics = await page.evaluate(() => {
+        const result: Record<string, { x: number; y: number; width: number; height: number }> = {};
+        for (const el of document.querySelectorAll('[class^="n-"]')) {
+          const id = el.className.replace(/^n-/, "");
+          const rect = el.getBoundingClientRect();
+          result[id] = {
+            x: rect.x + window.scrollX,
+            y: rect.y + window.scrollY,
+            width: rect.width,
+            height: rect.height,
+          };
+        }
+        return result;
+      });
+
+      return { screenshotPath: options.screenshotPath, title: await page.title(), domMetrics };
     } finally {
       await context.close();
     }
