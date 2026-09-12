@@ -34,32 +34,40 @@ const JUSTIFY_MAP: Record<string, LayoutIR["justify"]> = {
 };
 
 // PRD §14.6: Horizontal/Vertical Auto Layout -> flex row/column, gap -> gap, padding -> padding.
+//
+// layoutSizingHorizontal/Vertical (and min/max) describe how THIS node sizes itself inside
+// ITS PARENT's layout -- confirmed against a live response present on nodes whose own
+// layoutMode is NONE. That is orthogonal to `mode`/`axis`/`gap` (which describe how THIS
+// node arranges ITS OWN children), so it must be extracted unconditionally, not only inside
+// the AUTO_LAYOUT branch.
 export function mapLayout(node: FigmaApiNode): LayoutIR {
   const fields = node as FigmaApiNode & AutoLayoutFields;
 
-  if (!fields.layoutMode || fields.layoutMode === "NONE") {
-    return { mode: "NONE" };
+  const layout: LayoutIR =
+    fields.layoutMode && fields.layoutMode !== "NONE"
+      ? {
+          mode: "AUTO_LAYOUT",
+          axis: fields.layoutMode === "HORIZONTAL" ? "HORIZONTAL" : "VERTICAL",
+          gap: fields.itemSpacing ?? 0,
+          padding: {
+            top: fields.paddingTop ?? 0,
+            right: fields.paddingRight ?? 0,
+            bottom: fields.paddingBottom ?? 0,
+            left: fields.paddingLeft ?? 0,
+          },
+          wrap: fields.layoutWrap === "WRAP",
+        }
+      : { mode: "NONE" };
+
+  if (layout.mode === "AUTO_LAYOUT") {
+    if (fields.counterAxisAlignItems) {
+      layout.align = ALIGN_MAP[fields.counterAxisAlignItems];
+    }
+    if (fields.primaryAxisAlignItems) {
+      layout.justify = JUSTIFY_MAP[fields.primaryAxisAlignItems];
+    }
   }
 
-  const layout: LayoutIR = {
-    mode: "AUTO_LAYOUT",
-    axis: fields.layoutMode === "HORIZONTAL" ? "HORIZONTAL" : "VERTICAL",
-    gap: fields.itemSpacing ?? 0,
-    padding: {
-      top: fields.paddingTop ?? 0,
-      right: fields.paddingRight ?? 0,
-      bottom: fields.paddingBottom ?? 0,
-      left: fields.paddingLeft ?? 0,
-    },
-    wrap: fields.layoutWrap === "WRAP",
-  };
-
-  if (fields.counterAxisAlignItems) {
-    layout.align = ALIGN_MAP[fields.counterAxisAlignItems];
-  }
-  if (fields.primaryAxisAlignItems) {
-    layout.justify = JUSTIFY_MAP[fields.primaryAxisAlignItems];
-  }
   if (fields.layoutSizingHorizontal || fields.layoutSizingVertical) {
     layout.sizing = {
       width: fields.layoutSizingHorizontal ?? "FIXED",
