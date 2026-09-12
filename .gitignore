@@ -7,5 +7,8 @@ benchmark/reports/*
 !benchmark/reports/.gitkeep
 scripts/raw-node-response.json
 scripts/parsed-node-ir.json
+scripts/generated.html
+scripts/generated.css
+scripts/*.png
 .DS_Store
 Thumbs.db

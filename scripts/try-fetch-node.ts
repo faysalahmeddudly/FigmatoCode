@@ -2,6 +2,8 @@ import "dotenv/config";
 import { writeFileSync } from "node:fs";
 import { FigmaClient } from "../packages/figma-client/dist/index.js";
 import { parseDocument } from "../packages/figma-parser/dist/index.js";
+import { validateDocument } from "../packages/design-ir/dist/index.js";
+import { generateHtml, generateCss } from "../packages/code-generator/dist/index.js";
 
 const FILE_KEY = "si0LCoBsffi63CK8doDsO4";
 const NODE_ID = "21:16041";
@@ -30,6 +32,15 @@ async function main() {
   console.log(
     `Parsed ${Object.keys(parsed.nodes).length} nodes. Root internalId: ${parsed.rootId}`,
   );
+
+  const validated = validateDocument(parsed);
+  console.log("Document passed design-ir validation.");
+
+  const html = generateHtml(validated);
+  const css = generateCss(validated);
+  writeFileSync("scripts/generated.html", html);
+  writeFileSync("scripts/generated.css", css);
+  console.log("Wrote scripts/generated.html and scripts/generated.css");
 }
 
 main().catch((error) => {
