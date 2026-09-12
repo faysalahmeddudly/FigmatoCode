@@ -26,3 +26,8 @@ export interface FigmaNodesResponse {
   version: string;
   nodes: Record<string, FigmaFileNodeEntry>;
 }
+
+export interface ImageExportResponse {
+  err: string | null;
+  images: Record<string, string | null>;
+}

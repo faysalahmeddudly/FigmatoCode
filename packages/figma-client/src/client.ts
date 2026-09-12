@@ -1,5 +1,5 @@
 import { FigmaClientError } from "./errors.js";
-import type { FigmaNodesResponse } from "./types.js";
+import type { FigmaNodesResponse, ImageExportResponse } from "./types.js";
 
 export interface FigmaClientOptions {
   token: string;
@@ -32,6 +32,44 @@ export class FigmaClient {
     const idsParam = encodeURIComponent(nodeIds.join(","));
     const path = `/files/${encodeURIComponent(fileKey)}/nodes?ids=${idsParam}`;
     return this.requestWithRetry<FigmaNodesResponse>(path);
+  }
+
+  // PRD §4.1 Reference Rendering Contract: the reference image is Figma's own rendered
+  // pixels for the frame, not a re-derivation from geometry. This is how that image is
+  // obtained -- scale=1 exports at the frame's native absoluteBoundingBox size, matching
+  // the render viewport used for the candidate screenshot.
+  async getImageUrls(
+    fileKey: string,
+    nodeIds: string[],
+    options?: { scale?: number; format?: "png" | "jpg" | "svg" | "pdf" },
+  ): Promise<ImageExportResponse> {
+    const idsParam = encodeURIComponent(nodeIds.join(","));
+    const scale = options?.scale ?? 1;
+    const format = options?.format ?? "png";
+    const path = `/images/${encodeURIComponent(fileKey)}?ids=${idsParam}&scale=${scale}&format=${format}`;
+    return this.requestWithRetry<ImageExportResponse>(path);
+  }
+
+  // The URL returned by getImageUrls is a pre-signed S3 link, not a Figma API path -- no
+  // token is sent, and it is fetched as-is rather than joined with baseUrl.
+  async downloadImage(url: string): Promise<Uint8Array> {
+    let response: Response;
+    try {
+      response = await fetch(url);
+    } catch {
+      throw new FigmaClientError(
+        "FIGMA_UNAVAILABLE",
+        "Network request to download exported image failed",
+      );
+    }
+    if (!response.ok) {
+      throw new FigmaClientError(
+        "FIGMA_UNAVAILABLE",
+        `Image download returned ${response.status}`,
+        response.status,
+      );
+    }
+    return new Uint8Array(await response.arrayBuffer());
   }
 
   private async requestWithRetry<T>(path: string): Promise<T> {

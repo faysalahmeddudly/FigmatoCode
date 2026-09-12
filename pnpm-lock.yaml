@@ -281,7 +281,11 @@ importers:
 
   packages/font-engine: {}
 
-  packages/geometry-engine: {}
+  packages/geometry-engine:
+    dependencies:
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/layout-solver: {}
 

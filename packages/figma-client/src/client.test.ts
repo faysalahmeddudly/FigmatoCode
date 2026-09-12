@@ -76,4 +76,44 @@ describe("FigmaClient", () => {
     expect(result.name).toBe("f");
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
+
+  it("getImageUrls requests scale/format and returns the image URL map", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse({ err: null, images: { "1:1": "https://s3/x.png" } }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = new FigmaClient({ token: "t" });
+    const result = await client.getImageUrls("file1", ["1:1"], { scale: 2, format: "png" });
+
+    expect(result.images["1:1"]).toBe("https://s3/x.png");
+    const [calledUrl] = fetchMock.mock.calls[0] as [string];
+    expect(calledUrl).toContain("/images/file1");
+    expect(calledUrl).toContain("scale=2");
+    expect(calledUrl).toContain("format=png");
+  });
+
+  it("downloadImage fetches raw bytes without the Figma token header", async () => {
+    const bytes = new Uint8Array([1, 2, 3]);
+    const fetchMock = vi.fn().mockResolvedValue(new Response(bytes, { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = new FigmaClient({ token: "t" });
+    const result = await client.downloadImage("https://s3/x.png");
+
+    expect(result).toEqual(bytes);
+    const [calledUrl, calledInit] = fetchMock.mock.calls[0] as [string, RequestInit | undefined];
+    expect(calledUrl).toBe("https://s3/x.png");
+    expect(calledInit).toBeUndefined();
+  });
+
+  it("downloadImage maps a failed download to FIGMA_UNAVAILABLE", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response("", { status: 500 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = new FigmaClient({ token: "t" });
+    await expect(client.downloadImage("https://s3/x.png")).rejects.toMatchObject({
+      code: "FIGMA_UNAVAILABLE",
+    });
+  });
 });
