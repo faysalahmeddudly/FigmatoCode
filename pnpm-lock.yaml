@@ -248,7 +248,11 @@ importers:
 
   packages/benchmark: {}
 
-  packages/clipping-engine: {}
+  packages/clipping-engine:
+    dependencies:
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/code-generator:
     dependencies:
@@ -256,7 +260,11 @@ importers:
         specifier: workspace:*
         version: link:../shared-contracts
 
-  packages/compositing-engine: {}
+  packages/compositing-engine:
+    dependencies:
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/design-ir:
     dependencies:
@@ -264,7 +272,11 @@ importers:
         specifier: workspace:*
         version: link:../shared-contracts
 
-  packages/effect-engine: {}
+  packages/effect-engine:
+    dependencies:
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/figma-client: {}
 
@@ -277,7 +289,11 @@ importers:
         specifier: workspace:*
         version: link:../shared-contracts
 
-  packages/flow-engine: {}
+  packages/flow-engine:
+    dependencies:
+      '@figma-engine/responsive-engine':
+        specifier: workspace:*
+        version: link:../responsive-engine
 
   packages/font-engine: {}
 
@@ -308,7 +324,11 @@ importers:
         specifier: workspace:*
         version: link:../shared-contracts
 
-  packages/paint-engine: {}
+  packages/paint-engine:
+    dependencies:
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/patch-engine:
     dependencies:
@@ -322,7 +342,11 @@ importers:
         specifier: ^1.63.0
         version: 1.63.0
 
-  packages/responsive-engine: {}
+  packages/responsive-engine:
+    dependencies:
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/root-cause-engine:
     dependencies:
@@ -336,7 +360,11 @@ importers:
         specifier: ^3.23.0
         version: 3.25.76
 
-  packages/stacking-engine: {}
+  packages/stacking-engine:
+    dependencies:
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../shared-contracts
 
   packages/visual-engine:
     dependencies:
