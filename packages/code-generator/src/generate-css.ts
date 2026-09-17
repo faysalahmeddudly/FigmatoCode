@@ -3,6 +3,10 @@ import { nodeClassName } from "./class-name.js";
 import { rgbaToCss } from "./color.js";
 import { computeAbsoluteChildSizing, computeChildSizing } from "./compute-sizing.js";
 
+// Maps Figma imageRef / assetId → a local file path or data URL usable in CSS.
+// Populated by the compile step after asset-engine resolves downloads.
+export type AssetMap = ReadonlyMap<string, string>;
+
 const ALIGN_ITEMS: Record<string, string> = {
   START: "flex-start",
   CENTER: "center",
@@ -49,12 +53,26 @@ function containerDeclarations(node: NodeIR): Record<string, string> {
   return decl;
 }
 
-function paintDeclarations(node: NodeIR): Record<string, string> {
+function paintDeclarations(node: NodeIR, assetMap?: AssetMap): Record<string, string> {
   const decl: Record<string, string> = {};
 
-  const solidFill = node.fills?.find((f) => f.kind === "SOLID");
-  if (solidFill && solidFill.kind === "SOLID") {
-    decl[node.type === "TEXT" ? "color" : "background-color"] = rgbaToCss(solidFill.color);
+  // IMAGE fill takes priority over SOLID fill — if we have a resolved local path, use it.
+  const imageFill = node.fills?.find((f) => f.kind === "IMAGE");
+  if (imageFill && imageFill.kind === "IMAGE" && assetMap) {
+    const localPath = assetMap.get(imageFill.assetId);
+    if (localPath) {
+      // Use file:// URL for local paths so Chromium can load them during render.
+      const url = localPath.startsWith("data:") ? localPath : `file:///${localPath.replace(/\\/g, "/")}`;
+      decl["background-image"] = `url("${url}")`;
+      decl["background-size"] = "cover";
+      decl["background-position"] = "center";
+      decl["background-repeat"] = "no-repeat";
+    }
+  } else {
+    const solidFill = node.fills?.find((f) => f.kind === "SOLID");
+    if (solidFill && solidFill.kind === "SOLID") {
+      decl[node.type === "TEXT" ? "color" : "background-color"] = rgbaToCss(solidFill.color);
+    }
   }
 
   const stroke = node.strokes?.[0];
@@ -98,7 +116,7 @@ function typographyDeclarations(node: NodeIR): Record<string, string> {
   return decl;
 }
 
-export function generateCss(doc: DesignDocument): string {
+export function generateCss(doc: DesignDocument, assetMap?: AssetMap): string {
   const rules: string[] = [];
 
   rules.push(
@@ -112,7 +130,7 @@ export function generateCss(doc: DesignDocument): string {
 
     const decl: Record<string, string> = {
       ...containerDeclarations(node),
-      ...paintDeclarations(node),
+      ...paintDeclarations(node, assetMap),
       ...typographyDeclarations(node),
     };
 

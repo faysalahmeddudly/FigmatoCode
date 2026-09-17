@@ -1,0 +1,1787 @@
+{
+  "rootId": "n0",
+  "nodes": {
+    "n5": {
+      "identity": {
+        "figmaId": "61:22588",
+        "internalId": "n5",
+        "structureHash": "968e672ead0773444bfcab32fa0258686ee13fa519ccd8caff970fd417512cdc"
+      },
+      "type": "TEXT",
+      "name": "PREMIUM AS COLOUR & APPAREL",
+      "parentId": "n4",
+      "children": [],
+      "absolute": {
+        "x": -1198,
+        "y": -424.5,
+        "width": 209,
+        "height": 16
+      },
+      "relative": {
+        "x": 0,
+        "y": 0,
+        "width": 209,
+        "height": 16
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "HUG",
+          "height": "HUG"
+        }
+      },
+      "typography": {
+        "fontFamily": "DM Sans",
+        "fontWeight": 700,
+        "fontStyle": "normal",
+        "fontSize": 12,
+        "lineHeight": 16,
+        "letterSpacing": 0.6000000238418579,
+        "textAlign": "LEFT",
+        "content": "PREMIUM AS COLOUR & APPAREL"
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 0.27843138575553894,
+            "g": 0.3333333432674408,
+            "b": 0.4117647111415863,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "TEXT",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.990Z"
+      }
+    },
+    "n4": {
+      "identity": {
+        "figmaId": "61:22587",
+        "internalId": "n4",
+        "structureHash": "85ca8d2089398923e67f11b1f6fe18826fe33c79dfe35d352daf1cb1a53a8733"
+      },
+      "type": "FRAME",
+      "name": "Margin",
+      "parentId": "n3",
+      "children": [
+        "n5"
+      ],
+      "absolute": {
+        "x": -1198,
+        "y": -424.5,
+        "width": 209,
+        "height": 16
+      },
+      "relative": {
+        "x": 0,
+        "y": 0,
+        "width": 209,
+        "height": 16
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "VERTICAL",
+        "gap": 0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "sizing": {
+          "width": "HUG",
+          "height": "HUG"
+        },
+        "wrap": false
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.990Z"
+      }
+    },
+    "n3": {
+      "identity": {
+        "figmaId": "61:22586",
+        "internalId": "n3",
+        "structureHash": "7e119adb7b6d825d65df04867ec462b1929b368efd2c0dbdbfd6acce85c02940"
+      },
+      "type": "FRAME",
+      "name": "Container",
+      "parentId": "n2",
+      "children": [
+        "n4"
+      ],
+      "absolute": {
+        "x": -1198,
+        "y": -424.5,
+        "width": 209,
+        "height": 16
+      },
+      "relative": {
+        "x": 0,
+        "y": 7,
+        "width": 209,
+        "height": 16
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "HORIZONTAL",
+        "gap": 0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "align": "CENTER",
+        "sizing": {
+          "width": "HUG",
+          "height": "HUG"
+        },
+        "wrap": false
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.990Z"
+      }
+    },
+    "n7": {
+      "identity": {
+        "figmaId": "61:22590",
+        "internalId": "n7",
+        "structureHash": "968e672ead0773444bfcab32fa0258686ee13fa519ccd8caff970fd417512cdc"
+      },
+      "type": "TEXT",
+      "name": "TRANSFORM YOUR IDEAS INTO PRINTED REALITY",
+      "parentId": "n6",
+      "children": [],
+      "absolute": {
+        "x": -1198,
+        "y": -387.5,
+        "width": 448,
+        "height": 144
+      },
+      "relative": {
+        "x": 0,
+        "y": 1,
+        "width": 448,
+        "height": 144
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "FILL",
+          "height": "FIXED"
+        }
+      },
+      "typography": {
+        "fontFamily": "DM Sans",
+        "fontWeight": 700,
+        "fontStyle": "normal",
+        "fontSize": 48,
+        "lineHeight": 48,
+        "letterSpacing": -1.2000000476837158,
+        "textAlign": "LEFT",
+        "content": "TRANSFORM YOUR\nIDEAS INTO\nPRINTED REALITY"
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 0.05882352963089943,
+            "g": 0.09019608050584793,
+            "b": 0.16470588743686676,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "TEXT",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.990Z"
+      }
+    },
+    "n6": {
+      "identity": {
+        "figmaId": "61:22589",
+        "internalId": "n6",
+        "structureHash": "c5ca9b3cd01952f665b7d8190ed21f7853397e88c081f35ab2b58efb8df214b8"
+      },
+      "type": "FRAME",
+      "name": "Heading 1",
+      "parentId": "n2",
+      "children": [
+        "n7"
+      ],
+      "absolute": {
+        "x": -1198,
+        "y": -388.5,
+        "width": 448,
+        "height": 145
+      },
+      "relative": {
+        "x": 0,
+        "y": 43,
+        "width": 448,
+        "height": 145
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "VERTICAL",
+        "gap": 0,
+        "padding": {
+          "top": 1,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "sizing": {
+          "width": "FILL",
+          "height": "HUG"
+        },
+        "wrap": false
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.990Z"
+      }
+    },
+    "n9": {
+      "identity": {
+        "figmaId": "61:22592",
+        "internalId": "n9",
+        "structureHash": "968e672ead0773444bfcab32fa0258686ee13fa519ccd8caff970fd417512cdc"
+      },
+      "type": "TEXT",
+      "name": "Melbourne’s leading direct-to-garment & screen printing specialists. Rapid turnarounds, retail quality, and zero minimum order requirements.",
+      "parentId": "n8",
+      "children": [],
+      "absolute": {
+        "x": -1198,
+        "y": -223.5,
+        "width": 475,
+        "height": 72
+      },
+      "relative": {
+        "x": 0,
+        "y": 0,
+        "width": 475,
+        "height": 72
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "HUG",
+          "height": "HUG"
+        }
+      },
+      "typography": {
+        "fontFamily": "Inter",
+        "fontWeight": 400,
+        "fontStyle": "normal",
+        "fontSize": 16,
+        "lineHeight": 24,
+        "letterSpacing": 0,
+        "textAlign": "LEFT",
+        "content": "Melbourne’s leading direct-to-garment & screen printing\nspecialists. Rapid turnarounds, retail quality, and zero minimum\norder requirements."
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 0.27843138575553894,
+            "g": 0.3333333432674408,
+            "b": 0.4117647111415863,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "TEXT",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.990Z"
+      }
+    },
+    "n8": {
+      "identity": {
+        "figmaId": "61:22591",
+        "internalId": "n8",
+        "structureHash": "2f207de507c712eabc8a5b3ae79912709c3eefaa7b0348e2a4aab5e7ce887226"
+      },
+      "type": "FRAME",
+      "name": "Container",
+      "parentId": "n2",
+      "children": [
+        "n9"
+      ],
+      "absolute": {
+        "x": -1198,
+        "y": -223.5,
+        "width": 448,
+        "height": 72
+      },
+      "relative": {
+        "x": 0,
+        "y": 208,
+        "width": 448,
+        "height": 72
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "VERTICAL",
+        "gap": 0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "sizing": {
+          "width": "FIXED",
+          "height": "HUG"
+        },
+        "wrap": false,
+        "maxWidth": 448
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.990Z"
+      }
+    },
+    "n12": {
+      "identity": {
+        "figmaId": "61:22595",
+        "internalId": "n12",
+        "structureHash": "a503c93db29294f5b82b254fcd59b2432184e729ff9fc50cd8c99086a24f8fc4"
+      },
+      "type": "RECTANGLE",
+      "name": "Link:shadow",
+      "parentId": "n11",
+      "children": [],
+      "absolute": {
+        "x": -1198,
+        "y": -122.5,
+        "width": 218.3300018310547,
+        "height": 48
+      },
+      "relative": {
+        "x": 0,
+        "y": 0,
+        "width": 218.3300018310547,
+        "height": 48
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "FIXED",
+          "height": "FIXED"
+        }
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 0.7450980544090271,
+            "g": 0.11764705926179886,
+            "b": 0.1764705926179886,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "radius": {
+        "topLeft": 6,
+        "topRight": 6,
+        "bottomRight": 6,
+        "bottomLeft": 6
+      },
+      "source": {
+        "figmaNodeType": "RECTANGLE",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.990Z"
+      }
+    },
+    "n13": {
+      "identity": {
+        "figmaId": "61:22596",
+        "internalId": "n13",
+        "structureHash": "968e672ead0773444bfcab32fa0258686ee13fa519ccd8caff970fd417512cdc"
+      },
+      "type": "TEXT",
+      "name": "Start Designing Now",
+      "parentId": "n11",
+      "children": [],
+      "absolute": {
+        "x": -1170,
+        "y": -108.5,
+        "width": 143,
+        "height": 20
+      },
+      "relative": {
+        "x": 28,
+        "y": 14,
+        "width": 143,
+        "height": 20
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "HUG",
+          "height": "HUG"
+        }
+      },
+      "typography": {
+        "fontFamily": "Inter",
+        "fontWeight": 400,
+        "fontStyle": "normal",
+        "fontSize": 14,
+        "lineHeight": 20,
+        "letterSpacing": 0.3499999940395355,
+        "textAlign": "CENTER",
+        "content": "Start Designing Now"
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "TEXT",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n15": {
+      "identity": {
+        "figmaId": "61:22598",
+        "internalId": "n15",
+        "structureHash": "968e672ead0773444bfcab32fa0258686ee13fa519ccd8caff970fd417512cdc"
+      },
+      "type": "TEXT",
+      "name": "→",
+      "parentId": "n14",
+      "children": [],
+      "absolute": {
+        "x": -1019,
+        "y": -107,
+        "width": 11,
+        "height": 20
+      },
+      "relative": {
+        "x": 0,
+        "y": 0,
+        "width": 11,
+        "height": 20
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "HUG",
+          "height": "HUG"
+        }
+      },
+      "typography": {
+        "fontFamily": "DM Sans",
+        "fontWeight": 700,
+        "fontStyle": "normal",
+        "fontSize": 14,
+        "lineHeight": 20,
+        "letterSpacing": 0.3499999940395355,
+        "textAlign": "LEFT",
+        "content": "→"
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "TEXT",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n14": {
+      "identity": {
+        "figmaId": "61:22597",
+        "internalId": "n14",
+        "structureHash": "bee87467249cd9e8c15a82ad876330d2371a9039a85c8fb62755d86ba290bb8f"
+      },
+      "type": "FRAME",
+      "name": "Container",
+      "parentId": "n11",
+      "children": [
+        "n15"
+      ],
+      "absolute": {
+        "x": -1019,
+        "y": -107,
+        "width": 11,
+        "height": 17
+      },
+      "relative": {
+        "x": 179,
+        "y": 15.5,
+        "width": 11,
+        "height": 17
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "VERTICAL",
+        "gap": 0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "sizing": {
+          "width": "HUG",
+          "height": "FIXED"
+        },
+        "wrap": false
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n11": {
+      "identity": {
+        "figmaId": "61:22594",
+        "internalId": "n11",
+        "structureHash": "509b0ebdf19ce663116a1d2dabc1c762013b8c1f10e977a4700152ec68865732"
+      },
+      "type": "FRAME",
+      "name": "Link",
+      "parentId": "n10",
+      "children": [
+        "n12",
+        "n13",
+        "n14"
+      ],
+      "absolute": {
+        "x": -1198,
+        "y": -122.5,
+        "width": 218,
+        "height": 48
+      },
+      "relative": {
+        "x": 0,
+        "y": 9,
+        "width": 218,
+        "height": 48
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "HORIZONTAL",
+        "gap": 8,
+        "padding": {
+          "top": 14,
+          "right": 28,
+          "bottom": 14,
+          "left": 28
+        },
+        "align": "CENTER",
+        "justify": "CENTER",
+        "sizing": {
+          "width": "HUG",
+          "height": "HUG"
+        },
+        "wrap": false
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 0.007843137718737125,
+            "g": 0.686274528503418,
+            "b": 0.9843137264251709,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "radius": {
+        "topLeft": 6,
+        "topRight": 6,
+        "bottomRight": 6,
+        "bottomLeft": 6
+      },
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n17": {
+      "identity": {
+        "figmaId": "61:22600",
+        "internalId": "n17",
+        "structureHash": "968e672ead0773444bfcab32fa0258686ee13fa519ccd8caff970fd417512cdc"
+      },
+      "type": "TEXT",
+      "name": "Explore Product",
+      "parentId": "n16",
+      "children": [],
+      "absolute": {
+        "x": -943,
+        "y": -108.5,
+        "width": 106,
+        "height": 20
+      },
+      "relative": {
+        "x": 21,
+        "y": 15,
+        "width": 106,
+        "height": 20
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "HUG",
+          "height": "HUG"
+        }
+      },
+      "typography": {
+        "fontFamily": "Inter",
+        "fontWeight": 400,
+        "fontStyle": "normal",
+        "fontSize": 14,
+        "lineHeight": 20,
+        "letterSpacing": 0,
+        "textAlign": "CENTER",
+        "content": "Explore Product"
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 0.7450980544090271,
+            "g": 0.11764705926179886,
+            "b": 0.1764705926179886,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "TEXT",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n16": {
+      "identity": {
+        "figmaId": "61:22599",
+        "internalId": "n16",
+        "structureHash": "5a021ecafe446c881b5bdd978819bcf06a16208c81412c8551e8236e081c697a"
+      },
+      "type": "FRAME",
+      "name": "Link",
+      "parentId": "n10",
+      "children": [
+        "n17"
+      ],
+      "absolute": {
+        "x": -964,
+        "y": -123.5,
+        "width": 148,
+        "height": 50
+      },
+      "relative": {
+        "x": 234,
+        "y": 8,
+        "width": 148,
+        "height": 50
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "HORIZONTAL",
+        "gap": 0,
+        "padding": {
+          "top": 14,
+          "right": 20,
+          "bottom": 14,
+          "left": 20
+        },
+        "align": "CENTER",
+        "justify": "CENTER",
+        "sizing": {
+          "width": "HUG",
+          "height": "HUG"
+        },
+        "wrap": false
+      },
+      "strokes": [
+        {
+          "paint": {
+            "kind": "SOLID",
+            "color": {
+              "r": 0.7450980544090271,
+              "g": 0.11764705926179886,
+              "b": 0.1764705926179886,
+              "a": 1
+            }
+          },
+          "width": 1
+        }
+      ],
+      "radius": {
+        "topLeft": 6,
+        "topRight": 6,
+        "bottomRight": 6,
+        "bottomLeft": 6
+      },
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n10": {
+      "identity": {
+        "figmaId": "61:22593",
+        "internalId": "n10",
+        "structureHash": "6da00ae49272432f42a405ccb8b3f19d13a88e1f0a647207065e6b3d81291e83"
+      },
+      "type": "FRAME",
+      "name": "Container",
+      "parentId": "n2",
+      "children": [
+        "n11",
+        "n16"
+      ],
+      "absolute": {
+        "x": -1198,
+        "y": -131.5,
+        "width": 448,
+        "height": 58
+      },
+      "relative": {
+        "x": 0,
+        "y": 300,
+        "width": 448,
+        "height": 58
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "HORIZONTAL",
+        "gap": 16,
+        "padding": {
+          "top": 8,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "align": "CENTER",
+        "sizing": {
+          "width": "FILL",
+          "height": "HUG"
+        },
+        "wrap": false
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n19": {
+      "identity": {
+        "figmaId": "61:22602",
+        "internalId": "n19",
+        "structureHash": "a503c93db29294f5b82b254fcd59b2432184e729ff9fc50cd8c99086a24f8fc4"
+      },
+      "type": "RECTANGLE",
+      "name": "Background",
+      "parentId": "n18",
+      "children": [],
+      "absolute": {
+        "x": -1198,
+        "y": -29.5,
+        "width": 10,
+        "height": 10
+      },
+      "relative": {
+        "x": 0,
+        "y": 24,
+        "width": 10,
+        "height": 10
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "FIXED",
+          "height": "FIXED"
+        }
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 0.7450980544090271,
+            "g": 0.11764705926179886,
+            "b": 0.1764705926179886,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "radius": {
+        "topLeft": 9999,
+        "topRight": 9999,
+        "bottomRight": 9999,
+        "bottomLeft": 9999
+      },
+      "source": {
+        "figmaNodeType": "RECTANGLE",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n21": {
+      "identity": {
+        "figmaId": "61:22604",
+        "internalId": "n21",
+        "structureHash": "a503c93db29294f5b82b254fcd59b2432184e729ff9fc50cd8c99086a24f8fc4"
+      },
+      "type": "RECTANGLE",
+      "name": "Background",
+      "parentId": "n20",
+      "children": [],
+      "absolute": {
+        "x": -1180,
+        "y": -28.5,
+        "width": 8,
+        "height": 8
+      },
+      "relative": {
+        "x": 8,
+        "y": 0,
+        "width": 8,
+        "height": 8
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "FIXED",
+          "height": "FIXED"
+        }
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 0.7960784435272217,
+            "g": 0.8352941274642944,
+            "b": 0.8823529481887817,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "radius": {
+        "topLeft": 9999,
+        "topRight": 9999,
+        "bottomRight": 9999,
+        "bottomLeft": 9999
+      },
+      "source": {
+        "figmaNodeType": "RECTANGLE",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n20": {
+      "identity": {
+        "figmaId": "61:22603",
+        "internalId": "n20",
+        "structureHash": "b75c021900abd160250dfd49e80fdbd5b8ed3bc2b29921a95ba5219ef4c433e8"
+      },
+      "type": "FRAME",
+      "name": "Margin",
+      "parentId": "n18",
+      "children": [
+        "n21"
+      ],
+      "absolute": {
+        "x": -1188,
+        "y": -28.5,
+        "width": 16,
+        "height": 8
+      },
+      "relative": {
+        "x": 10,
+        "y": 25,
+        "width": 16,
+        "height": 8
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "VERTICAL",
+        "gap": 0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 8
+        },
+        "sizing": {
+          "width": "FIXED",
+          "height": "FIXED"
+        },
+        "wrap": false
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n23": {
+      "identity": {
+        "figmaId": "61:22606",
+        "internalId": "n23",
+        "structureHash": "a503c93db29294f5b82b254fcd59b2432184e729ff9fc50cd8c99086a24f8fc4"
+      },
+      "type": "RECTANGLE",
+      "name": "Background",
+      "parentId": "n22",
+      "children": [],
+      "absolute": {
+        "x": -1164,
+        "y": -28.5,
+        "width": 8,
+        "height": 8
+      },
+      "relative": {
+        "x": 8,
+        "y": 0,
+        "width": 8,
+        "height": 8
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "FIXED",
+          "height": "FIXED"
+        }
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 0.7960784435272217,
+            "g": 0.8352941274642944,
+            "b": 0.8823529481887817,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "radius": {
+        "topLeft": 9999,
+        "topRight": 9999,
+        "bottomRight": 9999,
+        "bottomLeft": 9999
+      },
+      "source": {
+        "figmaNodeType": "RECTANGLE",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n22": {
+      "identity": {
+        "figmaId": "61:22605",
+        "internalId": "n22",
+        "structureHash": "917babb6f945214c1c1dcc8f171bc6eea2e3c76de5e828a854a7a48640b409da"
+      },
+      "type": "FRAME",
+      "name": "Margin",
+      "parentId": "n18",
+      "children": [
+        "n23"
+      ],
+      "absolute": {
+        "x": -1172,
+        "y": -28.5,
+        "width": 16,
+        "height": 8
+      },
+      "relative": {
+        "x": 26,
+        "y": 25,
+        "width": 16,
+        "height": 8
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "VERTICAL",
+        "gap": 0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 8
+        },
+        "sizing": {
+          "width": "FIXED",
+          "height": "FIXED"
+        },
+        "wrap": false
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n18": {
+      "identity": {
+        "figmaId": "61:22601",
+        "internalId": "n18",
+        "structureHash": "3b1d21e9b85af0ced8164814a63078d4e201a1f6e4a00cbc8800b51f7f0422b7"
+      },
+      "type": "FRAME",
+      "name": "Pagination dots matching reference",
+      "parentId": "n2",
+      "children": [
+        "n19",
+        "n20",
+        "n22"
+      ],
+      "absolute": {
+        "x": -1198,
+        "y": -53.5,
+        "width": 448,
+        "height": 34
+      },
+      "relative": {
+        "x": 0,
+        "y": 378,
+        "width": 448,
+        "height": 34
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "HORIZONTAL",
+        "gap": 0,
+        "padding": {
+          "top": 24,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "align": "CENTER",
+        "sizing": {
+          "width": "FILL",
+          "height": "HUG"
+        },
+        "wrap": false
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n2": {
+      "identity": {
+        "figmaId": "61:22585",
+        "internalId": "n2",
+        "structureHash": "0def8c10be66e49d5fbd2392dd360ce07a67ee318aa0b9e6bafa45528c6a403b"
+      },
+      "type": "FRAME",
+      "name": "Left Banner Copy (Matching Reference Text Hierarchy)",
+      "parentId": "n1",
+      "children": [
+        "n3",
+        "n6",
+        "n8",
+        "n10",
+        "n18"
+      ],
+      "absolute": {
+        "x": -1198,
+        "y": -431.5,
+        "width": 448,
+        "height": 412
+      },
+      "relative": {
+        "x": 0,
+        "y": 6.5,
+        "width": 448,
+        "height": 412
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "VERTICAL",
+        "gap": 20,
+        "padding": {
+          "top": 7,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "sizing": {
+          "width": "HUG",
+          "height": "HUG"
+        },
+        "wrap": false
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n26": {
+      "identity": {
+        "figmaId": "61:22609",
+        "internalId": "n26",
+        "structureHash": "59b454736b35bde8df0a9b63e8ad26393a9d0b9704d2c3d2ebf8073f4980253c"
+      },
+      "type": "FRAME",
+      "name": "Custom printed streetwear graphic tee",
+      "parentId": "n25",
+      "children": [],
+      "absolute": {
+        "x": -668,
+        "y": -438,
+        "width": 710,
+        "height": 425
+      },
+      "relative": {
+        "x": 0,
+        "y": 0,
+        "width": 710,
+        "height": 425
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "FILL",
+          "height": "FIXED"
+        }
+      },
+      "fills": [
+        {
+          "kind": "IMAGE",
+          "assetId": "d50e389f68a0fdf36445c40a35cd3204cc7d5ee3"
+        }
+      ],
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n27": {
+      "identity": {
+        "figmaId": "61:22610",
+        "internalId": "n27",
+        "structureHash": "a503c93db29294f5b82b254fcd59b2432184e729ff9fc50cd8c99086a24f8fc4"
+      },
+      "type": "RECTANGLE",
+      "name": "Gradient",
+      "parentId": "n25",
+      "children": [],
+      "absolute": {
+        "x": -668,
+        "y": -438,
+        "width": 710,
+        "height": 425
+      },
+      "relative": {
+        "x": 0,
+        "y": 0,
+        "width": 710,
+        "height": 425
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "FIXED",
+          "height": "FIXED"
+        }
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "RECTANGLE",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n29": {
+      "identity": {
+        "figmaId": "61:22612",
+        "internalId": "n29",
+        "structureHash": "a503c93db29294f5b82b254fcd59b2432184e729ff9fc50cd8c99086a24f8fc4"
+      },
+      "type": "RECTANGLE",
+      "name": "Button - Video play button overlay matching reference:shadow",
+      "parentId": "n28",
+      "children": [],
+      "absolute": {
+        "x": -337,
+        "y": -249.5,
+        "width": 48,
+        "height": 48
+      },
+      "relative": {
+        "x": 0,
+        "y": 0,
+        "width": 48,
+        "height": 48
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "FIXED",
+          "height": "FIXED"
+        }
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1,
+            "a": 0.0020000000949949026
+          }
+        }
+      ],
+      "strokes": [],
+      "radius": {
+        "topLeft": 9999,
+        "topRight": 9999,
+        "bottomRight": 9999,
+        "bottomLeft": 9999
+      },
+      "source": {
+        "figmaNodeType": "RECTANGLE",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n31": {
+      "identity": {
+        "figmaId": "61:22614",
+        "internalId": "n31",
+        "structureHash": "dec4210153def6f1e34df42da5dcab9bbabf120fce3e8a44431c03fbaff587ab"
+      },
+      "type": "VECTOR",
+      "name": "Vector",
+      "parentId": "n30",
+      "children": [],
+      "absolute": {
+        "x": -318,
+        "y": -232.89013671875,
+        "width": 12.34422492980957,
+        "height": 14.780285835266113
+      },
+      "relative": {
+        "x": 4,
+        "y": 2.60986328125,
+        "width": 12.34422492980957,
+        "height": 14.780285835266113
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE"
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 0.05882352963089943,
+            "g": 0.09019608050584793,
+            "b": 0.16470588743686676,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "VECTOR",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n30": {
+      "identity": {
+        "figmaId": "61:22613",
+        "internalId": "n30",
+        "structureHash": "11680d2a9e5ddc2137ca65a45e97cba95bea1cefdbf276b4165b9eac761ecfe5"
+      },
+      "type": "FRAME",
+      "name": "SVG",
+      "parentId": "n28",
+      "children": [
+        "n31"
+      ],
+      "absolute": {
+        "x": -322,
+        "y": -235.5,
+        "width": 20,
+        "height": 20
+      },
+      "relative": {
+        "x": 15,
+        "y": 14,
+        "width": 20,
+        "height": 20
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "NONE",
+        "sizing": {
+          "width": "FIXED",
+          "height": "FIXED"
+        }
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n28": {
+      "identity": {
+        "figmaId": "61:22611",
+        "internalId": "n28",
+        "structureHash": "c35e177b20f28ad84222d4a17aca36079301caa33563510b59d09daf1cf525dd"
+      },
+      "type": "FRAME",
+      "name": "Button - Video play button overlay matching reference",
+      "parentId": "n25",
+      "children": [
+        "n29",
+        "n30"
+      ],
+      "absolute": {
+        "x": -337,
+        "y": -249.5,
+        "width": 48,
+        "height": 48
+      },
+      "relative": {
+        "x": 331,
+        "y": 188.5,
+        "width": 48,
+        "height": 48
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "HORIZONTAL",
+        "gap": 0,
+        "padding": {
+          "top": 0,
+          "right": 13,
+          "bottom": 0,
+          "left": 15
+        },
+        "align": "CENTER",
+        "justify": "CENTER",
+        "sizing": {
+          "width": "FIXED",
+          "height": "FIXED"
+        },
+        "wrap": false
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1,
+            "a": 0.8999999761581421
+          }
+        }
+      ],
+      "strokes": [],
+      "radius": {
+        "topLeft": 9999,
+        "topRight": 9999,
+        "bottomRight": 9999,
+        "bottomLeft": 9999
+      },
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n25": {
+      "identity": {
+        "figmaId": "61:22608",
+        "internalId": "n25",
+        "structureHash": "d4b7a6e1fe619e4a28adff3d7f94c745b710af806625879d1a37af77915fbaec"
+      },
+      "type": "FRAME",
+      "name": "Left Mockup Card with Video Trigger",
+      "parentId": "n24",
+      "children": [
+        "n26",
+        "n27",
+        "n28"
+      ],
+      "absolute": {
+        "x": -668,
+        "y": -438,
+        "width": 710,
+        "height": 425
+      },
+      "relative": {
+        "x": 0,
+        "y": 0,
+        "width": 710,
+        "height": 425
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "VERTICAL",
+        "gap": 0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "justify": "CENTER",
+        "sizing": {
+          "width": "FILL",
+          "height": "HUG"
+        },
+        "wrap": false
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 0.9450980424880981,
+            "g": 0.9607843160629272,
+            "b": 0.9764705896377563,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [],
+      "radius": {
+        "topLeft": 12,
+        "topRight": 12,
+        "bottomRight": 12,
+        "bottomLeft": 12
+      },
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n24": {
+      "identity": {
+        "figmaId": "61:22607",
+        "internalId": "n24",
+        "structureHash": "4def1c65f678ba4110b6567a1b74c02c4bf7a04b566db59d1bd261d28aa29bda"
+      },
+      "type": "FRAME",
+      "name": "Right Visual Grid: Apparel Lifestyle & Mockups (Matching Ref Two-Up Imagery)",
+      "parentId": "n1",
+      "children": [
+        "n25"
+      ],
+      "absolute": {
+        "x": -668,
+        "y": -438,
+        "width": 710,
+        "height": 425
+      },
+      "relative": {
+        "x": 530,
+        "y": 0,
+        "width": 710,
+        "height": 425
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "HORIZONTAL",
+        "gap": 16,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "justify": "CENTER",
+        "sizing": {
+          "width": "FILL",
+          "height": "FIXED"
+        },
+        "wrap": false
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n1": {
+      "identity": {
+        "figmaId": "61:22584",
+        "internalId": "n1",
+        "structureHash": "211b8d54d9306030342207e0d5046012cfba4d2717c267285d1b6ec1857603f7"
+      },
+      "type": "FRAME",
+      "name": "Container",
+      "parentId": "n0",
+      "children": [
+        "n2",
+        "n24"
+      ],
+      "absolute": {
+        "x": -1198,
+        "y": -438,
+        "width": 1240,
+        "height": 425
+      },
+      "relative": {
+        "x": 100,
+        "y": 48,
+        "width": 1240,
+        "height": 425
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "VERTICAL",
+        "gap": 0,
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "sizing": {
+          "width": "FIXED",
+          "height": "HUG"
+        },
+        "wrap": false
+      },
+      "strokes": [],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    },
+    "n0": {
+      "identity": {
+        "figmaId": "61:22583",
+        "internalId": "n0",
+        "structureHash": "cc40fc270bd1a098b71fcae96fa9e1b20ece78a8488396bac1ed513fad53b57b"
+      },
+      "type": "FRAME",
+      "name": "HeroBannerSection",
+      "parentId": null,
+      "children": [
+        "n1"
+      ],
+      "absolute": {
+        "x": -1298,
+        "y": -486,
+        "width": 1440,
+        "height": 522
+      },
+      "relative": {
+        "x": -1298,
+        "y": -486,
+        "width": 1440,
+        "height": 522
+      },
+      "visible": true,
+      "opacity": 1,
+      "layout": {
+        "mode": "AUTO_LAYOUT",
+        "axis": "VERTICAL",
+        "gap": 0,
+        "padding": {
+          "top": 48,
+          "right": 32,
+          "bottom": 48,
+          "left": 32
+        },
+        "align": "CENTER",
+        "justify": "CENTER",
+        "sizing": {
+          "width": "FIXED",
+          "height": "HUG"
+        },
+        "wrap": false
+      },
+      "fills": [
+        {
+          "kind": "SOLID",
+          "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1,
+            "a": 1
+          }
+        }
+      ],
+      "strokes": [
+        {
+          "paint": {
+            "kind": "SOLID",
+            "color": {
+              "r": 0.9450980424880981,
+              "g": 0.9607843160629272,
+              "b": 0.9764705896377563,
+              "a": 1
+            }
+          },
+          "width": 1
+        }
+      ],
+      "source": {
+        "figmaNodeType": "FRAME",
+        "figmaFileVersion": "2400083869921785055",
+        "parserVersion": "0.0.0",
+        "extractedAt": "2026-09-17T10:43:01.991Z"
+      }
+    }
+  }
+}
