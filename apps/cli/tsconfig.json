@@ -5,5 +5,18 @@
     "rootDir": "src"
   },
   "include": ["src"],
-  "references": []
+  "references": [
+    { "path": "../../packages/shared-contracts" },
+    { "path": "../../packages/figma-client" },
+    { "path": "../../packages/figma-parser" },
+    { "path": "../../packages/design-ir" },
+    { "path": "../../packages/font-engine" },
+    { "path": "../../packages/asset-engine" },
+    { "path": "../../packages/code-generator" },
+    { "path": "../../packages/renderer" },
+    { "path": "../../packages/geometry-engine" },
+    { "path": "../../packages/visual-engine" },
+    { "path": "../../packages/optimizer" },
+    { "path": "../../packages/benchmark" }
+  ]
 }

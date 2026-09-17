@@ -12,6 +12,18 @@
     "build": "tsc -b"
   },
   "dependencies": {
+    "@figma-engine/asset-engine": "workspace:*",
+    "@figma-engine/benchmark": "workspace:*",
+    "@figma-engine/code-generator": "workspace:*",
+    "@figma-engine/design-ir": "workspace:*",
+    "@figma-engine/figma-client": "workspace:*",
+    "@figma-engine/figma-parser": "workspace:*",
+    "@figma-engine/font-engine": "workspace:*",
+    "@figma-engine/geometry-engine": "workspace:*",
+    "@figma-engine/optimizer": "workspace:*",
+    "@figma-engine/renderer": "workspace:*",
+    "@figma-engine/shared-contracts": "workspace:*",
+    "@figma-engine/visual-engine": "workspace:*",
     "commander": "^12.1.0",
     "dotenv": "^16.4.5"
   }

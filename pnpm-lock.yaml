@@ -237,6 +237,42 @@ importers:
 
   apps/cli:
     dependencies:
+      '@figma-engine/asset-engine':
+        specifier: workspace:*
+        version: link:../../packages/asset-engine
+      '@figma-engine/benchmark':
+        specifier: workspace:*
+        version: link:../../packages/benchmark
+      '@figma-engine/code-generator':
+        specifier: workspace:*
+        version: link:../../packages/code-generator
+      '@figma-engine/design-ir':
+        specifier: workspace:*
+        version: link:../../packages/design-ir
+      '@figma-engine/figma-client':
+        specifier: workspace:*
+        version: link:../../packages/figma-client
+      '@figma-engine/figma-parser':
+        specifier: workspace:*
+        version: link:../../packages/figma-parser
+      '@figma-engine/font-engine':
+        specifier: workspace:*
+        version: link:../../packages/font-engine
+      '@figma-engine/geometry-engine':
+        specifier: workspace:*
+        version: link:../../packages/geometry-engine
+      '@figma-engine/optimizer':
+        specifier: workspace:*
+        version: link:../../packages/optimizer
+      '@figma-engine/renderer':
+        specifier: workspace:*
+        version: link:../../packages/renderer
+      '@figma-engine/shared-contracts':
+        specifier: workspace:*
+        version: link:../../packages/shared-contracts
+      '@figma-engine/visual-engine':
+        specifier: workspace:*
+        version: link:../../packages/visual-engine
       commander:
         specifier: ^12.1.0
         version: 12.1.0
