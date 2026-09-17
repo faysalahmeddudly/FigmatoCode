@@ -146,8 +146,8 @@ export function generateCss(doc: DesignDocument, assetMap?: AssetMap): string {
 
       if (parent.layout.mode !== "AUTO_LAYOUT") {
         decl["position"] = "absolute";
-        decl["left"] = `${node.relative.x}px`;
-        decl["top"] = `${node.relative.y}px`;
+        decl["left"] = `${node.absolute.x - parent.absolute.x}px`;
+        decl["top"] = `${node.absolute.y - parent.absolute.y}px`;
       }
 
       for (const [prop, value] of Object.entries(sizing)) {

@@ -59,8 +59,8 @@ export function registerCompareCommand(program: Command): void {
 
         // Fidelity score (§15.4) — geometry + perceptual only for now
         const fidelity = computeFidelityScore({
-          geometry: geometryScore,
-          perceptual: visualResult.perceptualSimilarity * 100,
+          geometry: geometryScore / 100,      // computeFidelityScore expects 0–1
+          perceptual: visualResult.perceptualSimilarity / 100, // already 0–100, normalize
         });
 
         const report = {
@@ -103,7 +103,7 @@ export function registerCompareCommand(program: Command): void {
 
         console.log(`[compare] ✓ geometry score:    ${geometryScore.toFixed(2)}%`);
         console.log(
-          `[compare] ✓ perceptual sim:   ${(visualResult.perceptualSimilarity * 100).toFixed(2)}%`,
+          `[compare] ✓ perceptual sim:   ${visualResult.perceptualSimilarity.toFixed(2)}%`,
         );
         console.log(`[compare] ✓ fidelity score:   ${(fidelity.score * 100).toFixed(2)}%`);
         console.log(
