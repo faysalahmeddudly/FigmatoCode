@@ -26,7 +26,8 @@ export function registerParseCommand(program: Command): void {
 
       console.log(`[parse] run=${runId} file=${opts.file} node=${opts.node}`);
 
-      const client = new FigmaClient({ token });
+      const databaseUrl = process.env.DATABASE_URL;
+      const client = new FigmaClient({ token, databaseUrl });
 
       let nodesResponse: Awaited<ReturnType<typeof client.getFileNodes>>;
       try {

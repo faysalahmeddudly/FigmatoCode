@@ -118,11 +118,15 @@ export function registerBenchmarkCommand(program: Command): void {
 
             // Render
             const screenshotPath = join(tmpDir, "screenshot.png");
+            const root = doc.nodes[doc.rootId];
+            const renderWidth = Math.round(root?.absolute.width ?? 1440);
+            const renderHeight = Math.round(root?.absolute.height ?? 900);
+
             let renderResult: Awaited<ReturnType<typeof renderer.render>>;
             try {
               renderResult = await renderer.render({
                 htmlPath,
-                viewport: { width: 1440, height: 900 },
+                viewport: { width: renderWidth, height: renderHeight },
                 screenshotPath,
               });
             } catch (err) {
@@ -154,8 +158,8 @@ export function registerBenchmarkCommand(program: Command): void {
             const visualResult = compareImages(referencePng, candidatePng, doc);
 
             const fidelity = computeFidelityScore({
-              geometry: geometryScore,
-              perceptual: visualResult.perceptualSimilarity * 100,
+              geometry: geometryScore / 100,
+              perceptual: visualResult.perceptualSimilarity / 100,
             });
 
             const passed = fidelity.score >= threshold;

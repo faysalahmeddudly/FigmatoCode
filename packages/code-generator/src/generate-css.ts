@@ -44,6 +44,9 @@ function containerDeclarations(node: NodeIR): Record<string, string> {
     if (node.layout.justify)
       decl["justify-content"] = JUSTIFY_CONTENT[node.layout.justify] ?? "flex-start";
     if (node.layout.wrap) decl["flex-wrap"] = "wrap";
+    
+    // Auto-layout nodes can also contain absolute children (layoutPositioning: "ABSOLUTE")
+    if (node.children.length > 0) decl["position"] = "relative";
   } else if (node.children.length > 0) {
     // A non-auto-layout node with children is the containing block for its absolutely
     // positioned children (PRD §14.6 "Absolute child -> position:absolute").
@@ -139,15 +142,21 @@ export function generateCss(doc: DesignDocument, assetMap?: AssetMap): string {
       decl["width"] = `${node.absolute.width}px`;
       decl["height"] = `${node.absolute.height}px`;
     } else if (parent) {
+      const isAbsolute = parent.layout.mode !== "AUTO_LAYOUT" || node.layout.positioning === "ABSOLUTE";
+
       const sizing =
-        parent.layout.mode === "AUTO_LAYOUT"
+        parent.layout.mode === "AUTO_LAYOUT" && node.layout.positioning !== "ABSOLUTE"
           ? computeChildSizing(node, parent.layout.axis ?? "VERTICAL")
           : computeAbsoluteChildSizing(node);
 
-      if (parent.layout.mode !== "AUTO_LAYOUT") {
+      if (isAbsolute) {
         decl["position"] = "absolute";
         decl["left"] = `${node.absolute.x - parent.absolute.x}px`;
         decl["top"] = `${node.absolute.y - parent.absolute.y}px`;
+      } else if (!decl["position"]) {
+        // Give normal flow children relative positioning so they paint in correct DOM order 
+        // alongside their absolutely positioned siblings.
+        decl["position"] = "relative";
       }
 
       for (const [prop, value] of Object.entries(sizing)) {

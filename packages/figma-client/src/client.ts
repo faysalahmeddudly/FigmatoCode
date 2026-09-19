@@ -1,11 +1,13 @@
 import { FigmaClientError } from "./errors.js";
 import type { FigmaNodesResponse, ImageExportResponse } from "./types.js";
+import { PgCache } from "./cache.js";
 
 export interface FigmaClientOptions {
   token: string;
   baseUrl?: string;
   maxRetries?: number;
   initialBackoffMs?: number;
+  databaseUrl?: string;
 }
 
 const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
@@ -17,6 +19,7 @@ export class FigmaClient {
   private readonly baseUrl: string;
   private readonly maxRetries: number;
   private readonly initialBackoffMs: number;
+  public readonly cache?: PgCache;
 
   constructor(options: FigmaClientOptions) {
     if (!options.token) {
@@ -26,6 +29,9 @@ export class FigmaClient {
     this.baseUrl = options.baseUrl ?? "https://api.figma.com/v1";
     this.maxRetries = options.maxRetries ?? 3;
     this.initialBackoffMs = options.initialBackoffMs ?? 500;
+    if (options.databaseUrl) {
+      this.cache = new PgCache(options.databaseUrl);
+    }
   }
 
   async getFileNodes(fileKey: string, nodeIds: string[]): Promise<FigmaNodesResponse> {
@@ -73,11 +79,18 @@ export class FigmaClient {
   }
 
   private async requestWithRetry<T>(path: string): Promise<T> {
+    if (this.cache) {
+      const cached = await this.cache.get<T>(path);
+      if (cached) return cached;
+    }
+
     let lastError: FigmaClientError | undefined;
 
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       try {
-        return await this.request<T>(path);
+        const response = await this.request<T>(path);
+        if (this.cache) await this.cache.set(path, response);
+        return response;
       } catch (error) {
         if (!(error instanceof FigmaClientError)) throw error;
         if (error.code !== "FIGMA_RATE_LIMIT" && error.code !== "FIGMA_UNAVAILABLE") {

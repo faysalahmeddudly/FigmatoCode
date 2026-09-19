@@ -17,6 +17,7 @@ interface AutoLayoutFields {
   maxWidth?: number;
   minHeight?: number;
   maxHeight?: number;
+  layoutPositioning?: "AUTO" | "ABSOLUTE";
 }
 
 const ALIGN_MAP: Record<string, LayoutIR["align"]> = {
@@ -78,6 +79,10 @@ export function mapLayout(node: FigmaApiNode): LayoutIR {
   if (fields.maxWidth !== undefined) layout.maxWidth = fields.maxWidth;
   if (fields.minHeight !== undefined) layout.minHeight = fields.minHeight;
   if (fields.maxHeight !== undefined) layout.maxHeight = fields.maxHeight;
+
+  if (fields.layoutPositioning === "ABSOLUTE") {
+    layout.positioning = "ABSOLUTE";
+  }
 
   return layout;
 }
